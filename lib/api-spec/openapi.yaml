@@ -260,7 +260,14 @@ components:
     BookingUpdate:
       type: object
       properties:
-        status: { type: string, enum: [pending, confirmed, cancelled] }
+        status:         { type: string, enum: [pending, confirmed, cancelled] }
+        firstName:      { type: string }
+        lastName:       { type: string }
+        email:          { type: string }
+        phone:          { type: string }
+        date:           { type: string }
+        time:           { type: string }
+        experienceType: { type: string }
         specialRequests: { type: string }
 
     Service:

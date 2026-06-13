@@ -29,17 +29,40 @@ export default function Home() {
     <div className="w-full flex flex-col bg-background">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-border">
-        {/* Background gradient/pattern could go here */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
-        
+        {/* Logo watermark background */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "url('/logo.jpeg')",
+            backgroundSize: "45%",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            opacity: 0.06,
+          }}
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/8 via-background/95 to-background pointer-events-none" />
+
         <div className="container px-4 md:px-8 relative z-10 text-center max-w-4xl mx-auto flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex flex-col items-center"
           >
-            <span className="text-primary tracking-[0.3em] uppercase text-sm md:text-sm font-medium mb-6 block">
-              Dubai Autodrome Circuit
+            {/* Logo ring */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-primary mb-8"
+              style={{ boxShadow: "0 0 48px rgba(239,68,68,0.2)" }}
+            >
+              <img src="/logo.jpeg" alt="LA RC Hub & Cafe" className="w-full h-full object-cover" />
+            </motion.div>
+
+            <span className="text-primary tracking-[0.3em] uppercase text-xs font-medium mb-6 block">
+              LA RC Hub &amp; Cafe
             </span>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-foreground mb-8 leading-tight tracking-tight">
               Precision. <br />

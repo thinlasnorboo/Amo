@@ -87,6 +87,13 @@ export const UpdateBookingParams = zod.object({
 
 export const UpdateBookingBody = zod.object({
   "status": zod.enum(['pending', 'confirmed', 'cancelled']).optional(),
+  "firstName": zod.string().optional(),
+  "lastName": zod.string().optional(),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "date": zod.string().optional(),
+  "time": zod.string().optional(),
+  "experienceType": zod.string().optional(),
   "specialRequests": zod.string().optional()
 })
 

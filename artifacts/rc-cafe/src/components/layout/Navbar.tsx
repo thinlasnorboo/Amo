@@ -31,11 +31,11 @@ export function Navbar() {
       }`}
     >
       <div className="container mx-auto px-4 md:px-8 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-serif tracking-widest text-primary flex items-center gap-2 group">
-          <span className="w-8 h-8 rounded-full border border-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-            R
-          </span>
-          RC TRACK CAFÉ
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-primary group-hover:border-primary/80 transition-colors flex-shrink-0">
+            <img src="/logo.jpeg" alt="LA RC Hub & Cafe" className="w-full h-full object-cover" />
+          </div>
+          <span className="text-lg font-serif tracking-widest text-primary">LA RC HUB &amp; CAFE</span>
         </Link>
 
         {/* Desktop Nav */}

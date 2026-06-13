@@ -6,10 +6,12 @@ import menuRouter from "./menu";
 import galleryRouter from "./gallery";
 import contactRouter from "./contact";
 import statsRouter from "./stats";
+import adminAuthRouter from "./adminAuth";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(adminAuthRouter);
 router.use(bookingsRouter);
 router.use(servicesRouter);
 router.use(menuRouter);

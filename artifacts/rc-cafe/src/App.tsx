@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
-// Page imports
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import Menu from "./pages/Menu";
@@ -13,6 +12,7 @@ import Gallery from "./pages/Gallery";
 import Book from "./pages/Book";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +35,7 @@ function MainRoutes() {
 function Router() {
   return (
     <Switch>
+      <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={Admin} />
       <Route component={MainRoutes} />
     </Switch>
@@ -45,7 +46,6 @@ function App() {
   if (typeof document !== "undefined") {
     document.documentElement.classList.add("dark");
   }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

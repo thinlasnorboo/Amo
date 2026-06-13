@@ -1,226 +1,442 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, FormEvent } from "react";
+import { useLocation } from "wouter";
 import {
   useGetStats,
   useListBookings,
   useUpdateBooking,
   useDeleteBooking,
+  useCreateBooking,
   useListContactMessages,
-  useListServices,
-  useListMenuItems,
 } from "@workspace/api-client-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
-type Tab = "overview" | "bookings" | "messages" | "services" | "menu";
+type Tab = "overview" | "bookings" | "messages";
 type BookingStatus = "pending" | "confirmed" | "cancelled";
 
-const STATUS_STYLES: Record<BookingStatus, string> = {
-  pending:   "background:rgba(234,179,8,0.15);color:#eab308;border:1px solid rgba(234,179,8,0.3)",
-  confirmed: "background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25)",
-  cancelled: "background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25)",
+interface BookingForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  date: string;
+  time: string;
+  experienceType: string;
+  specialRequests: string;
+}
+
+const EMPTY_FORM: BookingForm = {
+  firstName: "", lastName: "", email: "", phone: "",
+  date: "", time: "", experienceType: "", specialRequests: "",
+};
+
+const RED = "hsl(0 84% 60%)";
+const BG = "hsl(0 0% 4%)";
+const CARD = "hsl(0 0% 7%)";
+const BORDER = "hsl(0 0% 14%)";
+const FG = "hsl(0 0% 98%)";
+const MUTED = "hsl(0 0% 55%)";
+
+const STATUS_COLORS: Record<BookingStatus, { bg: string; color: string; border: string }> = {
+  pending:   { bg: "rgba(234,179,8,0.12)",  color: "#eab308", border: "rgba(234,179,8,0.3)" },
+  confirmed: { bg: "rgba(34,197,94,0.1)",   color: "#22c55e", border: "rgba(34,197,94,0.25)" },
+  cancelled: { bg: "rgba(239,68,68,0.1)",   color: "#ef4444", border: "rgba(239,68,68,0.25)" },
 };
 
 function StatusBadge({ status }: { status: string }) {
-  const s = STATUS_STYLES[status as BookingStatus] ?? STATUS_STYLES.pending;
+  const s = STATUS_COLORS[status as BookingStatus] ?? STATUS_COLORS.pending;
   return (
-    <span style={{ display:"inline-block", padding:"2px 12px", fontSize:"10px", fontWeight:600, letterSpacing:"0.12em", textTransform:"uppercase", ...Object.fromEntries(s.split(";").filter(Boolean).map(p => { const [k,...v] = p.split(":"); return [k.trim().replace(/-([a-z])/g,(_:string,c:string)=>c.toUpperCase()), v.join(":").trim()]; })) }}>
-      {status}
-    </span>
+    <span style={{
+      display: "inline-block", padding: "3px 12px",
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.12em",
+      textTransform: "uppercase", background: s.bg, color: s.color,
+      border: `1px solid ${s.border}`,
+    }}>{status}</span>
+  );
+}
+
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1000,
+      background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)",
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
+    }} onClick={onClose}>
+      <div style={{
+        background: CARD, border: `1px solid ${BORDER}`,
+        width: "100%", maxWidth: 580, maxHeight: "90vh", overflowY: "auto",
+        position: "relative",
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ height: 2, background: RED }} />
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "24px 28px 0",
+        }}>
+          <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, color: FG }}>{title}</h3>
+          <button onClick={onClose} style={{
+            background: "none", border: "none", color: MUTED,
+            cursor: "pointer", fontSize: 22, lineHeight: 1, padding: 4,
+          }}>×</button>
+        </div>
+        <div style={{ padding: 28 }}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function BookingFormFields({ form, onChange }: {
+  form: BookingForm;
+  onChange: (k: keyof BookingForm, v: string) => void;
+}) {
+  const inputStyle = {
+    width: "100%", background: BG, border: `1px solid ${BORDER}`,
+    color: FG, fontFamily: "'Inter',sans-serif", fontSize: 13,
+    padding: "11px 14px", outline: "none", boxSizing: "border-box" as const,
+  };
+  const labelStyle = {
+    display: "block" as const, fontSize: 10, fontWeight: 600 as const,
+    letterSpacing: "0.18em", textTransform: "uppercase" as const,
+    color: MUTED, marginBottom: 7,
+  };
+  const grp = (mb = 20) => ({ marginBottom: mb });
+
+  return (
+    <>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={grp()}>
+          <label style={labelStyle}>First Name *</label>
+          <input style={inputStyle} value={form.firstName} required
+            onChange={e => onChange("firstName", e.target.value)} />
+        </div>
+        <div style={grp()}>
+          <label style={labelStyle}>Last Name *</label>
+          <input style={inputStyle} value={form.lastName} required
+            onChange={e => onChange("lastName", e.target.value)} />
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={grp()}>
+          <label style={labelStyle}>Email *</label>
+          <input type="email" style={inputStyle} value={form.email} required
+            onChange={e => onChange("email", e.target.value)} />
+        </div>
+        <div style={grp()}>
+          <label style={labelStyle}>Phone / Contact</label>
+          <input type="tel" style={inputStyle} value={form.phone} placeholder="+91..."
+            onChange={e => onChange("phone", e.target.value)} />
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={grp()}>
+          <label style={labelStyle}>Booking Date *</label>
+          <input type="date" style={inputStyle} value={form.date} required
+            onChange={e => onChange("date", e.target.value)} />
+        </div>
+        <div style={grp()}>
+          <label style={labelStyle}>Time *</label>
+          <select style={{ ...inputStyle, height: 44 }} value={form.time} required
+            onChange={e => onChange("time", e.target.value)}>
+            <option value="">Select Time</option>
+            {["10:00","12:00","14:00","16:00","18:00","20:00"].map(t => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div style={grp()}>
+        <label style={labelStyle}>Experience *</label>
+        <select style={{ ...inputStyle, height: 44 }} value={form.experienceType} required
+          onChange={e => onChange("experienceType", e.target.value)}>
+          <option value="">Select Experience</option>
+          <option value="open_practice">Open Practice</option>
+          <option value="rental_basic">Basic Rental Package</option>
+          <option value="rental_pro">Pro Telemetry Package</option>
+          <option value="vip_pit">VIP Pit Reservation</option>
+          <option value="private_event">Private Event / Corporate</option>
+        </select>
+      </div>
+      <div style={grp(0)}>
+        <label style={labelStyle}>Special Requests</label>
+        <textarea style={{ ...inputStyle, minHeight: 80, resize: "none" }} value={form.specialRequests}
+          onChange={e => onChange("specialRequests", e.target.value)} />
+      </div>
+    </>
   );
 }
 
 export default function Admin() {
+  const [, navigate] = useLocation();
   const [tab, setTab] = useState<Tab>("overview");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
-  const { data: stats, isLoading: statsLoading } = useGetStats();
+  const [showAdd, setShowAdd] = useState(false);
+  const [editBooking, setEditBooking] = useState<null | { id: number; form: BookingForm }>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<null | number>(null);
+  const [addForm, setAddForm] = useState<BookingForm>(EMPTY_FORM);
+
+  const { data: stats } = useGetStats();
   const { data: bookings, isLoading: bookingsLoading } = useListBookings();
   const { data: messages, isLoading: msgsLoading } = useListContactMessages();
-  const { data: services } = useListServices();
-  const { data: menuItems } = useListMenuItems();
 
+  const createBooking = useCreateBooking();
   const updateBooking = useUpdateBooking();
   const deleteBooking = useDeleteBooking();
 
-  const filteredBookings = bookings?.filter(b =>
-    statusFilter === "all" ? true : b.status === statusFilter
-  );
+  // Auth guard
+  useEffect(() => {
+    const token = localStorage.getItem("rc_admin_token");
+    if (!token) navigate("/admin/login");
+  }, [navigate]);
+
+  const logout = () => {
+    localStorage.removeItem("rc_admin_token");
+    navigate("/admin/login");
+  };
+
+  const filteredBookings = bookings?.filter(b => {
+    const matchStatus = statusFilter === "all" || b.status === statusFilter;
+    const q = search.toLowerCase();
+    const matchSearch = !q || `${b.firstName} ${b.lastName} ${b.email} ${b.phone ?? ""}`.toLowerCase().includes(q);
+    return matchStatus && matchSearch;
+  });
+
+  const handleAdd = (e: FormEvent) => {
+    e.preventDefault();
+    createBooking.mutate({ data: addForm }, {
+      onSuccess: () => { setShowAdd(false); setAddForm(EMPTY_FORM); },
+    });
+  };
+
+  const handleEdit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!editBooking) return;
+    updateBooking.mutate({ id: editBooking.id, data: editBooking.form }, {
+      onSuccess: () => setEditBooking(null),
+    });
+  };
+
+  const handleDelete = (id: number) => {
+    deleteBooking.mutate({ id }, { onSuccess: () => setDeleteConfirm(null) });
+  };
 
   const css = `
-    .adm { min-height:100vh; background:hsl(0 0% 4%); padding-top:80px; font-family:'Inter',sans-serif; }
-    .adm-header { border-bottom:1px solid hsl(0 0% 12%); background:hsl(0 0% 6%); padding:32px; }
-    .adm-header h1 { font-family:'Playfair Display',serif; font-size:2rem; color:hsl(0 0% 98%); margin-bottom:4px; }
-    .adm-header p { font-size:13px; color:hsl(0 0% 60%); }
-    .adm-tabs { display:flex; gap:0; border-bottom:1px solid hsl(0 0% 12%); background:hsl(0 0% 6%); overflow-x:auto; }
-    .adm-tab { padding:16px 28px; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:hsl(0 0% 60%); border:none; background:none; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:.25s; }
-    .adm-tab:hover { color:hsl(44 55% 54%); }
-    .adm-tab.on { color:hsl(44 55% 54%); border-color:hsl(44 55% 54%); }
-    .adm-body { padding:40px 32px; max-width:1280px; }
-    .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:40px; }
-    .stat-card { background:hsl(0 0% 6%); border:1px solid hsl(0 0% 12%); padding:28px; }
-    .stat-card .num { font-family:'Playfair Display',serif; font-size:2.4rem; color:hsl(44 55% 54%); display:block; margin-bottom:6px; }
-    .stat-card .lbl { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:hsl(0 0% 60%); }
-    .section-title { font-family:'Playfair Display',serif; font-size:1.4rem; color:hsl(0 0% 98%); margin-bottom:24px; }
-    .filter-row { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
-    .flt { padding:8px 20px; font-size:10px; letter-spacing:.15em; text-transform:uppercase; background:hsl(0 0% 6%); border:1px solid hsl(0 0% 12%); color:hsl(0 0% 60%); cursor:pointer; transition:.2s; }
-    .flt:hover { border-color:hsl(44 55% 54%); color:hsl(44 55% 54%); }
-    .flt.on { background:hsl(44 55% 54%); color:hsl(0 0% 9%); border-color:hsl(44 55% 54%); }
-    table { width:100%; border-collapse:collapse; }
-    th { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:hsl(0 0% 60%); padding:12px 16px; text-align:left; border-bottom:1px solid hsl(0 0% 12%); background:hsl(0 0% 6%); }
-    td { padding:14px 16px; font-size:13px; color:hsl(0 0% 80%); border-bottom:1px solid hsl(0 0% 10%); vertical-align:middle; }
-    tr:hover td { background:rgba(255,255,255,0.02); }
-    .action-btn { padding:6px 14px; font-size:10px; letter-spacing:.12em; text-transform:uppercase; border:1px solid; cursor:pointer; background:none; transition:.2s; margin-right:6px; }
-    .btn-confirm { border-color:rgba(34,197,94,0.4); color:#22c55e; }
-    .btn-confirm:hover { background:rgba(34,197,94,0.12); }
-    .btn-cancel  { border-color:rgba(234,179,8,0.4);  color:#eab308; }
-    .btn-cancel:hover  { background:rgba(234,179,8,0.1); }
-    .btn-del     { border-color:rgba(239,68,68,0.35);  color:#ef4444; }
-    .btn-del:hover     { background:rgba(239,68,68,0.1); }
-    .msg-card { background:hsl(0 0% 6%); border:1px solid hsl(0 0% 12%); padding:24px; margin-bottom:12px; }
-    .msg-card h4 { font-size:14px; color:hsl(0 0% 98%); margin-bottom:4px; }
-    .msg-card .meta { font-size:11px; color:hsl(0 0% 50%); margin-bottom:12px; letter-spacing:.05em; }
-    .msg-card p { font-size:13px; color:hsl(0 0% 65%); line-height:1.75; }
-    .srv-card { background:hsl(0 0% 6%); border:1px solid hsl(0 0% 12%); padding:24px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
-    .srv-card h4 { font-size:15px; color:hsl(0 0% 98%); margin-bottom:4px; }
-    .srv-card p  { font-size:12px; color:hsl(0 0% 55%); }
-    .price-tag { font-family:'Playfair Display',serif; font-size:1.3rem; color:hsl(44 55% 54%); white-space:nowrap; }
-    .empty-state { text-align:center; padding:60px; border:1px solid hsl(0 0% 12%); background:hsl(0 0% 6%); }
-    .empty-state p { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:hsl(0 0% 45%); }
-    .skel { background:hsl(0 0% 10%); border-radius:2px; animation:pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:.3} }
-    .dot-feat { display:inline-block; width:6px; height:6px; border-radius:50%; background:hsl(44 55% 54%); margin-right:8px; vertical-align:middle; }
-    @media(max-width:768px) { .stat-grid{grid-template-columns:1fr 1fr} .adm-body{padding:24px 16px} }
-    @media(max-width:480px) { .stat-grid{grid-template-columns:1fr} }
+    .adm-wrap * { box-sizing: border-box; }
+    .adm-wrap table { width:100%; border-collapse:collapse; font-size:13px; }
+    .adm-wrap th { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:${MUTED}; padding:12px 14px; text-align:left; border-bottom:1px solid ${BORDER}; background:${BG}; white-space:nowrap; }
+    .adm-wrap td { padding:13px 14px; color:hsl(0 0% 78%); border-bottom:1px solid hsl(0 0% 10%); vertical-align:middle; }
+    .adm-wrap tr:hover td { background:rgba(255,255,255,0.02); }
+    .adm-wrap .ab { padding:6px 12px; font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; border:1px solid; cursor:pointer; background:none; font-family:'Inter',sans-serif; transition:.2s; }
+    .adm-wrap .ab-ed { border-color:rgba(239,68,68,0.4); color:${RED}; }
+    .adm-wrap .ab-ed:hover { background:rgba(239,68,68,0.1); }
+    .adm-wrap .ab-cn { border-color:rgba(34,197,94,0.4); color:#22c55e; }
+    .adm-wrap .ab-cn:hover { background:rgba(34,197,94,0.08); }
+    .adm-wrap .ab-cl { border-color:rgba(234,179,8,0.4); color:#eab308; }
+    .adm-wrap .ab-cl:hover { background:rgba(234,179,8,0.08); }
+    .adm-wrap .ab-dl { border-color:rgba(239,68,68,0.5); color:#ef4444; }
+    .adm-wrap .ab-dl:hover { background:rgba(239,68,68,0.12); }
+    .adm-wrap .sc { animation:pulse 1.5s ease-in-out infinite; background:hsl(0 0% 11%); border-radius:2px; }
+    @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:.25} }
+    .adm-wrap input:focus, .adm-wrap select:focus, .adm-wrap textarea:focus { border-color:${RED} !important; }
+    @media(max-width:768px) {
+      .adm-wrap .stat-g { grid-template-columns:1fr 1fr !important; }
+      .adm-wrap .desk-only { display:none !important; }
+      .adm-wrap .mob-scroll { overflow-x:auto; }
+    }
+    @media(max-width:480px) {
+      .adm-wrap .stat-g { grid-template-columns:1fr !important; }
+    }
   `;
 
   return (
     <>
       <style>{css}</style>
-      <div className="adm">
+      <div className="adm-wrap" style={{ minHeight: "100vh", background: BG, fontFamily: "'Inter',sans-serif" }}>
+
         {/* Header */}
-        <div className="adm-header">
-          <div style={{ maxWidth:1280, padding:"0 32px" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:4 }}>
-              <span style={{ width:8,height:8,borderRadius:"50%",background:"hsl(44 55% 54%)",display:"inline-block" }} />
-              <h1>Admin Panel</h1>
+        <div style={{ background: CARD, borderBottom: `1px solid ${BORDER}`, padding: "0 24px" }}>
+          <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 0" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", border: `1.5px solid ${RED}`, flexShrink: 0 }}>
+                <img src="/logo.jpeg" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
+              <div>
+                <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, color: FG, lineHeight: 1.2 }}>Admin Panel</div>
+                <div style={{ fontSize: 10, color: MUTED, letterSpacing: "0.15em", textTransform: "uppercase" }}>LA RC Hub & Cafe</div>
+              </div>
             </div>
-            <p>RC Track Café — Manage bookings, messages, and venue content</p>
+            <button onClick={logout} style={{
+              background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+              padding: "8px 20px", fontSize: 11, letterSpacing: "0.15em",
+              textTransform: "uppercase", cursor: "pointer", fontFamily: "'Inter',sans-serif",
+              transition: ".2s",
+            }}
+              onMouseEnter={e => { (e.target as HTMLElement).style.borderColor = RED; (e.target as HTMLElement).style.color = RED; }}
+              onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = BORDER; (e.target as HTMLElement).style.color = MUTED; }}>
+              Logout
+            </button>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="adm-tabs">
-          {(["overview","bookings","messages","services","menu"] as Tab[]).map(t => (
-            <button key={t} className={`adm-tab ${tab===t?"on":""}`} onClick={()=>setTab(t)}>
-              {t === "overview" ? "Overview" : t === "bookings" ? `Bookings${bookings ? ` (${bookings.length})` : ""}` : t === "messages" ? `Messages${messages ? ` (${messages.length})` : ""}` : t === "services" ? `Services${services ? ` (${services.length})` : ""}` : `Menu${menuItems ? ` (${menuItems.length})` : ""}`}
-            </button>
-          ))}
+        <div style={{ background: CARD, borderBottom: `1px solid ${BORDER}`, overflowX: "auto" }}>
+          <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex" }}>
+            {(["overview", "bookings", "messages"] as Tab[]).map(t => (
+              <button key={t} onClick={() => setTab(t)} style={{
+                padding: "15px 28px", fontSize: 11, letterSpacing: "0.18em",
+                textTransform: "uppercase", background: "none", border: "none",
+                cursor: "pointer", fontFamily: "'Inter',sans-serif", whiteSpace: "nowrap",
+                color: tab === t ? RED : MUTED,
+                borderBottom: `2px solid ${tab === t ? RED : "transparent"}`,
+                transition: ".2s",
+              }}>
+                {t === "bookings" ? `Bookings${bookings ? ` (${bookings.length})` : ""}` :
+                  t === "messages" ? `Messages${messages ? ` (${messages.length})` : ""}` :
+                    "Overview"}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="adm-body">
+        {/* Body */}
+        <div style={{ maxWidth: 1320, margin: "0 auto", padding: "36px 24px" }}>
 
           {/* ── OVERVIEW ── */}
           {tab === "overview" && (
-            <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{duration:.4}}>
-              <div className="stat-grid">
-                {statsLoading ? [...Array(7)].map((_,i)=>(
-                  <div key={i} className="stat-card"><div className="skel" style={{height:48,marginBottom:10}} /><div className="skel" style={{height:12,width:100}} /></div>
-                )) : stats ? (<>
-                  <div className="stat-card"><span className="num">{stats.totalBookings}</span><span className="lbl">Total Bookings</span></div>
-                  <div className="stat-card"><span className="num">{stats.confirmedBookings}</span><span className="lbl">Confirmed</span></div>
-                  <div className="stat-card"><span className="num">{stats.pendingBookings}</span><span className="lbl">Pending</span></div>
-                  <div className="stat-card"><span className="num">{stats.totalTracks}</span><span className="lbl">Pro Tracks</span></div>
-                  <div className="stat-card"><span className="num">{stats.memberCount}+</span><span className="lbl">Club Members</span></div>
-                  <div className="stat-card"><span className="num">{stats.coffeeVarieties}</span><span className="lbl">Coffee Varieties</span></div>
-                  <div className="stat-card"><span className="num">{stats.yearsOpen}</span><span className="lbl">Years Open</span></div>
-                </>) : null}
+            <div>
+              <div className="stat-g" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 40 }}>
+                {[
+                  { num: stats?.totalBookings ?? "–", lbl: "Total Bookings" },
+                  { num: stats?.confirmedBookings ?? "–", lbl: "Confirmed" },
+                  { num: stats?.pendingBookings ?? "–", lbl: "Pending" },
+                  { num: `${stats?.memberCount ?? "–"}+`, lbl: "Club Members" },
+                ].map((s, i) => (
+                  <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, padding: 24, position: "relative", overflow: "hidden" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: RED, opacity: i === 0 ? 1 : 0.35 }} />
+                    <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "2.2rem", color: RED, marginBottom: 6 }}>{s.num}</div>
+                    <div style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED }}>{s.lbl}</div>
+                  </div>
+                ))}
               </div>
 
-              {/* Recent bookings preview */}
-              <h3 className="section-title">Recent Bookings</h3>
-              {bookingsLoading ? (
-                <div>{[...Array(3)].map((_,i)=><div key={i} className="skel" style={{height:56,marginBottom:8}} />)}</div>
-              ) : bookings && bookings.length > 0 ? (
-                <div style={{overflowX:"auto"}}>
-                  <table>
-                    <thead><tr><th>Name</th><th>Experience</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody>
-                      {bookings.slice(0,5).map(b=>(
-                        <tr key={b.id}>
-                          <td style={{color:"hsl(0 0% 98%)",fontWeight:500}}>{b.firstName} {b.lastName}</td>
-                          <td>{b.experienceType}</td>
-                          <td>{b.date}</td>
-                          <td>{b.time}</td>
-                          <td><StatusBadge status={b.status} /></td>
-                          <td>
-                            {b.status !== "confirmed"  && <button className="action-btn btn-confirm" onClick={()=>updateBooking.mutate({id:b.id, data:{status:"confirmed"}})}>Confirm</button>}
-                            {b.status !== "cancelled"  && <button className="action-btn btn-cancel"  onClick={()=>updateBooking.mutate({id:b.id, data:{status:"cancelled"}})}>Cancel</button>}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {bookings.length > 5 && (
-                    <p style={{fontSize:12,color:"hsl(0 0% 50%)",marginTop:12,textAlign:"center",cursor:"pointer",letterSpacing:".1em"}} onClick={()=>setTab("bookings")}>
-                      View all {bookings.length} bookings &rarr;
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="empty-state"><p>No bookings yet</p></div>
-              )}
-            </motion.div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", color: FG }}>Recent Reservations</h3>
+                <button onClick={() => setTab("bookings")} style={{
+                  background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+                  padding: "7px 18px", fontSize: 10, letterSpacing: "0.15em",
+                  textTransform: "uppercase", cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>View All &rarr;</button>
+              </div>
+              <div className="mob-scroll">
+                <table>
+                  <thead>
+                    <tr><th>Customer</th><th>Contact</th><th>Experience</th><th>Booking Date</th><th>Submitted On</th><th>Status</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody>
+                    {bookings?.slice(0, 6).map(b => (
+                      <tr key={b.id}>
+                        <td style={{ color: FG, fontWeight: 500 }}>{b.firstName} {b.lastName}</td>
+                        <td style={{ color: MUTED, fontSize: 12 }}>{b.phone || b.email}</td>
+                        <td>{b.experienceType}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 12 }}>{b.date}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 12 }}>{new Date(b.createdAt).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" })}</td>
+                        <td><StatusBadge status={b.status} /></td>
+                        <td>
+                          {b.status !== "confirmed" && <button className="ab ab-cn" style={{ marginRight: 6 }} onClick={() => updateBooking.mutate({ id: b.id, data: { status: "confirmed" } })}>✓</button>}
+                          {b.status !== "cancelled" && <button className="ab ab-cl" onClick={() => updateBooking.mutate({ id: b.id, data: { status: "cancelled" } })}>✕</button>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {(!bookings || bookings.length === 0) && !bookingsLoading && (
+                  <div style={{ textAlign: "center", padding: 48, border: `1px solid ${BORDER}`, background: CARD, marginTop: 12 }}>
+                    <p style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED }}>No bookings yet</p>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
 
           {/* ── BOOKINGS ── */}
           {tab === "bookings" && (
-            <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{duration:.4}}>
-              <h3 className="section-title">All Reservations</h3>
-              <div className="filter-row">
-                {["all","pending","confirmed","cancelled"].map(f=>(
-                  <button key={f} className={`flt ${statusFilter===f?"on":""}`} onClick={()=>setStatusFilter(f)}>{f}</button>
-                ))}
+            <div>
+              {/* Toolbar */}
+              <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
+                <button onClick={() => { setAddForm(EMPTY_FORM); setShowAdd(true); }} style={{
+                  background: RED, color: "#fff", border: "none", padding: "11px 24px",
+                  fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>+ Add Booking</button>
+
+                <input value={search} onChange={e => setSearch(e.target.value)}
+                  placeholder="Search name, email, phone..."
+                  style={{
+                    background: CARD, border: `1px solid ${BORDER}`, color: FG,
+                    padding: "10px 16px", fontSize: 13, fontFamily: "'Inter',sans-serif",
+                    outline: "none", width: 240,
+                  }} />
+
+                <div style={{ display: "flex", gap: 6 }}>
+                  {["all", "pending", "confirmed", "cancelled"].map(f => (
+                    <button key={f} onClick={() => setStatusFilter(f)} style={{
+                      padding: "8px 16px", fontSize: 10, fontWeight: 600,
+                      letterSpacing: "0.15em", textTransform: "uppercase",
+                      background: statusFilter === f ? RED : CARD,
+                      border: `1px solid ${statusFilter === f ? RED : BORDER}`,
+                      color: statusFilter === f ? "#fff" : MUTED,
+                      cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                      transition: ".2s",
+                    }}>{f}</button>
+                  ))}
+                </div>
+
+                <span style={{ fontSize: 12, color: MUTED, marginLeft: "auto" }}>
+                  {filteredBookings?.length ?? 0} record{filteredBookings?.length !== 1 ? "s" : ""}
+                </span>
               </div>
+
               {bookingsLoading ? (
-                <div>{[...Array(5)].map((_,i)=><div key={i} className="skel" style={{height:56,marginBottom:8}} />)}</div>
+                <div>{[...Array(5)].map((_, i) => <div key={i} className="sc" style={{ height: 52, marginBottom: 8 }} />)}</div>
               ) : filteredBookings && filteredBookings.length > 0 ? (
-                <div style={{overflowX:"auto"}}>
+                <div className="mob-scroll">
                   <table>
                     <thead>
                       <tr>
-                        <th>ID</th><th>Name</th><th>Email</th><th>Experience</th>
-                        <th>Date</th><th>Time</th><th>Status</th><th>Actions</th>
+                        <th>#</th>
+                        <th>Customer Name</th>
+                        <th>Contact Number</th>
+                        <th>Email</th>
+                        <th>Experience</th>
+                        <th>Booking Date</th>
+                        <th>Submitted On</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredBookings.map(b=>(
+                      {filteredBookings.map(b => (
                         <tr key={b.id}>
-                          <td style={{color:"hsl(0 0% 45%)",fontSize:12}}>#{b.id}</td>
-                          <td style={{color:"hsl(0 0% 98%)",fontWeight:500}}>{b.firstName} {b.lastName}</td>
-                          <td style={{color:"hsl(0 0% 55%)",fontSize:12}}>{b.email}</td>
-                          <td>{b.experienceType}</td>
-                          <td>{b.date}</td>
-                          <td>{b.time}</td>
+                          <td style={{ color: MUTED, fontSize: 11 }}>#{b.id}</td>
+                          <td style={{ color: FG, fontWeight: 500 }}>{b.firstName} {b.lastName}</td>
+                          <td style={{ fontFamily: "monospace", fontSize: 12 }}>{b.phone || <span style={{ color: MUTED }}>—</span>}</td>
+                          <td style={{ fontSize: 12, color: MUTED }}>{b.email}</td>
+                          <td style={{ fontSize: 12 }}>{b.experienceType}</td>
+                          <td style={{ fontFamily: "monospace", fontSize: 12 }}>{b.date}</td>
+                          <td style={{ fontFamily: "monospace", fontSize: 11 }}>{new Date(b.createdAt).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" })}</td>
                           <td><StatusBadge status={b.status} /></td>
-                          <td>
-                            {b.status !== "confirmed" && (
-                              <button className="action-btn btn-confirm" disabled={updateBooking.isPending}
-                                onClick={()=>updateBooking.mutate({id:b.id, data:{status:"confirmed"}})}>
-                                Confirm
-                              </button>
-                            )}
-                            {b.status !== "cancelled" && (
-                              <button className="action-btn btn-cancel" disabled={updateBooking.isPending}
-                                onClick={()=>updateBooking.mutate({id:b.id, data:{status:"cancelled"}})}>
-                                Cancel
-                              </button>
-                            )}
-                            {b.status === "pending" && (
-                              <button className="action-btn btn-del" disabled={deleteBooking.isPending}
-                                onClick={()=>{ if(confirm(`Delete booking #${b.id}?`)) deleteBooking.mutate({id:b.id}); }}>
-                                Delete
-                              </button>
-                            )}
+                          <td style={{ whiteSpace: "nowrap" }}>
+                            <button className="ab ab-ed" style={{ marginRight: 5 }} onClick={() => setEditBooking({
+                              id: b.id,
+                              form: {
+                                firstName: b.firstName, lastName: b.lastName,
+                                email: b.email, phone: b.phone ?? "",
+                                date: b.date, time: b.time,
+                                experienceType: b.experienceType,
+                                specialRequests: b.specialRequests ?? "",
+                              }
+                            })}>Edit</button>
+                            {b.status !== "confirmed" && <button className="ab ab-cn" style={{ marginRight: 5 }} onClick={() => updateBooking.mutate({ id: b.id, data: { status: "confirmed" } })}>Confirm</button>}
+                            {b.status !== "cancelled" && <button className="ab ab-cl" style={{ marginRight: 5 }} onClick={() => updateBooking.mutate({ id: b.id, data: { status: "cancelled" } })}>Cancel</button>}
+                            <button className="ab ab-dl" onClick={() => setDeleteConfirm(b.id)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -228,95 +444,128 @@ export default function Admin() {
                   </table>
                 </div>
               ) : (
-                <div className="empty-state"><p>No {statusFilter !== "all" ? statusFilter : ""} bookings found</p></div>
+                <div style={{ textAlign: "center", padding: 64, border: `1px solid ${BORDER}`, background: CARD }}>
+                  <p style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED }}>
+                    {search ? "No matching bookings found" : `No ${statusFilter !== "all" ? statusFilter : ""} bookings`}
+                  </p>
+                </div>
               )}
-            </motion.div>
+            </div>
           )}
 
           {/* ── MESSAGES ── */}
           {tab === "messages" && (
-            <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{duration:.4}}>
-              <h3 className="section-title">Contact Messages</h3>
+            <div>
+              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", color: FG, marginBottom: 24 }}>Contact Messages</h3>
               {msgsLoading ? (
-                <div>{[...Array(4)].map((_,i)=><div key={i} className="skel" style={{height:100,marginBottom:12}} />)}</div>
+                <div>{[...Array(4)].map((_, i) => <div key={i} className="sc" style={{ height: 100, marginBottom: 12 }} />)}</div>
               ) : messages && messages.length > 0 ? (
-                [...messages].reverse().map(m=>(
-                  <div key={m.id} className="msg-card">
-                    <h4>{m.name} {m.subject ? <span style={{fontWeight:400,color:"hsl(0 0% 55%)"}}>&mdash; {m.subject}</span> : null}</h4>
-                    <p className="meta">{m.email} &middot; {new Date(m.createdAt).toLocaleString("en-AE",{dateStyle:"medium",timeStyle:"short"})}</p>
-                    <p>{m.message}</p>
-                  </div>
-                ))
-              ) : (
-                <div className="empty-state"><p>No messages yet</p></div>
-              )}
-            </motion.div>
-          )}
-
-          {/* ── SERVICES ── */}
-          {tab === "services" && (
-            <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{duration:.4}}>
-              <h3 className="section-title">Services</h3>
-              {services && services.length > 0 ? (
-                services.map(s=>(
-                  <div key={s.id} className="srv-card">
-                    <div style={{flex:1}}>
-                      <h4>
-                        {s.featured && <span className="dot-feat" title="Featured" />}
-                        {s.name}
-                      </h4>
-                      <p style={{marginBottom:6}}>{s.description}</p>
-                      <p style={{color:"hsl(0 0% 40%)",fontSize:11,letterSpacing:".1em",textTransform:"uppercase"}}>{s.category}</p>
-                    </div>
-                    <div style={{textAlign:"right"}}>
-                      <div className="price-tag">AED {s.priceFrom.toLocaleString()}</div>
-                      <div style={{fontSize:11,color:"hsl(0 0% 50%)",letterSpacing:".1em",textTransform:"uppercase",marginTop:2}}>/ {s.priceUnit}</div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="empty-state"><p>Loading services...</p></div>
-              )}
-            </motion.div>
-          )}
-
-          {/* ── MENU ── */}
-          {tab === "menu" && (
-            <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{duration:.4}}>
-              <h3 className="section-title">Menu Items</h3>
-              {menuItems && menuItems.length > 0 ? (
-                (["espresso","filter","cold","specialty","food"] as const).map(cat => {
-                  const items = menuItems.filter(m=>m.category===cat);
-                  if (!items.length) return null;
-                  return (
-                    <div key={cat} style={{marginBottom:40}}>
-                      <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:20}}>
-                        <h4 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.2rem",color:"hsl(0 0% 98%)",textTransform:"capitalize",whiteSpace:"nowrap"}}>{cat}</h4>
-                        <div style={{flex:1,height:1,background:"hsl(0 0% 12%)"}} />
-                        <span style={{fontSize:11,color:"hsl(0 0% 45%)",letterSpacing:".1em"}}>{items.length} items</span>
+                [...messages].reverse().map(m => (
+                  <div key={m.id} style={{ background: CARD, border: `1px solid ${BORDER}`, padding: 24, marginBottom: 12, borderLeft: `3px solid ${RED}` }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                      <div>
+                        <span style={{ fontSize: 15, fontWeight: 600, color: FG }}>{m.name}</span>
+                        {m.subject && <span style={{ fontSize: 12, color: MUTED, marginLeft: 12 }}>— {m.subject}</span>}
                       </div>
-                      {items.map(item=>(
-                        <div key={item.id} className="srv-card">
-                          <div style={{flex:1}}>
-                            <h4>
-                              {item.featured && <span className="dot-feat" title="Featured" />}
-                              {item.name}
-                            </h4>
-                            <p>{item.description}</p>
-                          </div>
-                          <div className="price-tag">AED {item.price}</div>
-                        </div>
-                      ))}
+                      <span style={{ fontSize: 11, color: MUTED, fontFamily: "monospace" }}>
+                        {new Date(m.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                      </span>
                     </div>
-                  );
-                })
+                    <div style={{ fontSize: 12, color: MUTED, marginBottom: 12 }}>{m.email}</div>
+                    <p style={{ fontSize: 14, color: "hsl(0 0% 72%)", lineHeight: 1.75, margin: 0 }}>{m.message}</p>
+                  </div>
+                ))
               ) : (
-                <div className="empty-state"><p>Loading menu...</p></div>
+                <div style={{ textAlign: "center", padding: 64, border: `1px solid ${BORDER}`, background: CARD }}>
+                  <p style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED }}>No messages yet</p>
+                </div>
               )}
-            </motion.div>
+            </div>
           )}
-
         </div>
+
+        {/* ── ADD BOOKING MODAL ── */}
+        {showAdd && (
+          <Modal title="Add New Booking" onClose={() => setShowAdd(false)}>
+            <form onSubmit={handleAdd}>
+              <BookingFormFields form={addForm} onChange={(k, v) => setAddForm(f => ({ ...f, [k]: v }))} />
+              <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
+                <button type="submit" disabled={createBooking.isPending} style={{
+                  flex: 1, background: RED, color: "#fff", border: "none", height: 48,
+                  fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>
+                  {createBooking.isPending ? "Adding..." : "Add Booking"}
+                </button>
+                <button type="button" onClick={() => setShowAdd(false)} style={{
+                  background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+                  padding: "0 24px", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>Cancel</button>
+              </div>
+            </form>
+          </Modal>
+        )}
+
+        {/* ── EDIT BOOKING MODAL ── */}
+        {editBooking && (
+          <Modal title={`Edit Booking #${editBooking.id}`} onClose={() => setEditBooking(null)}>
+            <form onSubmit={handleEdit}>
+              <BookingFormFields
+                form={editBooking.form}
+                onChange={(k, v) => setEditBooking(eb => eb ? { ...eb, form: { ...eb.form, [k]: v } } : eb)}
+              />
+              <div style={{ marginTop: 20 }}>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED, marginBottom: 7 }}>Status</label>
+                <select value={editBooking.form.experienceType}
+                  onChange={e => updateBooking.mutate({ id: editBooking.id, data: { status: e.target.value as BookingStatus } })}
+                  style={{ background: BG, border: `1px solid ${BORDER}`, color: FG, fontFamily: "'Inter',sans-serif", fontSize: 13, padding: "11px 14px", width: "100%", height: 44 }}>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
+                <button type="submit" disabled={updateBooking.isPending} style={{
+                  flex: 1, background: RED, color: "#fff", border: "none", height: 48,
+                  fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>
+                  {updateBooking.isPending ? "Saving..." : "Save Changes"}
+                </button>
+                <button type="button" onClick={() => setEditBooking(null)} style={{
+                  background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+                  padding: "0 24px", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>Cancel</button>
+              </div>
+            </form>
+          </Modal>
+        )}
+
+        {/* ── DELETE CONFIRM ── */}
+        {deleteConfirm !== null && (
+          <Modal title="Delete Booking" onClose={() => setDeleteConfirm(null)}>
+            <p style={{ fontSize: 14, color: "hsl(0 0% 70%)", marginBottom: 28, lineHeight: 1.75 }}>
+              Are you sure you want to delete booking <strong style={{ color: FG }}>#{deleteConfirm}</strong>?
+              This action cannot be undone.
+            </p>
+            <div style={{ display: "flex", gap: 12 }}>
+              <button onClick={() => handleDelete(deleteConfirm)} disabled={deleteBooking.isPending} style={{
+                flex: 1, background: "hsl(0 84% 60%)", color: "#fff", border: "none", height: 48,
+                fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                cursor: "pointer", fontFamily: "'Inter',sans-serif",
+              }}>
+                {deleteBooking.isPending ? "Deleting..." : "Yes, Delete"}
+              </button>
+              <button onClick={() => setDeleteConfirm(null)} style={{
+                background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+                padding: "0 24px", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase",
+                cursor: "pointer", fontFamily: "'Inter',sans-serif",
+              }}>Cancel</button>
+            </div>
+          </Modal>
+        )}
       </div>
     </>
   );

@@ -60,6 +60,13 @@ export const BookingUpdateStatus = {
 
 export interface BookingUpdate {
   status?: BookingUpdateStatus;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  date?: string;
+  time?: string;
+  experienceType?: string;
   specialRequests?: string;
 }
 
