@@ -155,6 +155,20 @@ export const ListGalleryItemsResponse = zod.array(ListGalleryItemsResponseItem)
 
 
 /**
+ * @summary List all contact messages (admin)
+ */
+export const ListContactMessagesResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "subject": zod.string().nullish(),
+  "message": zod.string(),
+  "createdAt": zod.string()
+})
+export const ListContactMessagesResponse = zod.array(ListContactMessagesResponseItem)
+
+
+/**
  * @summary Submit a contact message
  */
 

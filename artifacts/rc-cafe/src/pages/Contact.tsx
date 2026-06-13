@@ -120,7 +120,7 @@ export default function Contact() {
               {isSuccess ? (
                 <div className="bg-card border border-border p-12 text-center h-full flex flex-col justify-center items-center">
                   <div className="w-16 h-16 border border-primary rounded-full flex items-center justify-center mb-6 text-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
                   <h3 className="text-2xl font-serif text-foreground mb-4">Message Received</h3>
                   <p className="text-muted-foreground font-light mb-8">

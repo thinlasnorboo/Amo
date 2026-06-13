@@ -62,7 +62,7 @@ export default function Book() {
           className="max-w-md w-full text-center px-4"
         >
           <div className="w-20 h-20 border border-primary rounded-full flex items-center justify-center mx-auto mb-8 text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           </div>
           <h1 className="text-4xl font-serif text-foreground mb-4">Reservation Confirmed</h1>
           <p className="text-muted-foreground font-light leading-relaxed mb-8">

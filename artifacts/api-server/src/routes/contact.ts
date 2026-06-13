@@ -4,6 +4,11 @@ import { SubmitContactBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
+router.get("/contact", async (_req, res): Promise<void> => {
+  const msgs = await db.select().from(contactMessagesTable).orderBy(contactMessagesTable.createdAt);
+  res.json(msgs);
+});
+
 router.post("/contact", async (req, res): Promise<void> => {
   const parsed = SubmitContactBody.safeParse(req.body);
   if (!parsed.success) {

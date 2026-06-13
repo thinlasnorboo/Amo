@@ -12,10 +12,11 @@ import Menu from "./pages/Menu";
 import Gallery from "./pages/Gallery";
 import Book from "./pages/Book";
 import Contact from "./pages/Contact";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
-function Router() {
+function MainRoutes() {
   return (
     <AppLayout>
       <Switch>
@@ -31,10 +32,18 @@ function Router() {
   );
 }
 
+function Router() {
+  return (
+    <Switch>
+      <Route path="/admin" component={Admin} />
+      <Route component={MainRoutes} />
+    </Switch>
+  );
+}
+
 function App() {
-  // Always enforce dark mode on root element
-  if (typeof document !== 'undefined') {
-    document.documentElement.classList.add('dark');
+  if (typeof document !== "undefined") {
+    document.documentElement.classList.add("dark");
   }
 
   return (

@@ -719,6 +719,83 @@ export function useListGalleryItems<TData = Awaited<ReturnType<typeof listGaller
 
 
 
+export const getListContactMessagesUrl = () => {
+
+
+
+
+  return `/api/contact`
+}
+
+/**
+ * @summary List all contact messages (admin)
+ */
+export const listContactMessages = async ( options?: RequestInit): Promise<ContactMessage[]> => {
+
+  return customFetch<ContactMessage[]>(getListContactMessagesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListContactMessagesQueryKey = () => {
+    return [
+    `/api/contact`
+    ] as const;
+    }
+
+
+export const getListContactMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listContactMessages>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listContactMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListContactMessagesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listContactMessages>>> = ({ signal }) => listContactMessages({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listContactMessages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListContactMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof listContactMessages>>>
+export type ListContactMessagesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all contact messages (admin)
+ */
+
+export function useListContactMessages<TData = Awaited<ReturnType<typeof listContactMessages>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listContactMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListContactMessagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getSubmitContactUrl = () => {
 
 
