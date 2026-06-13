@@ -1,22 +1,33 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: RC Track Café API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: bookings
+    description: Reservation management
+  - name: services
+    description: Services offered
+  - name: menu
+    description: Coffee & food menu
+  - name: gallery
+    description: Gallery items
+  - name: contact
+    description: Contact messages
+  - name: stats
+    description: Venue statistics
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +35,177 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /bookings:
+    get:
+      operationId: listBookings
+      tags: [bookings]
+      summary: List all bookings
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a new booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingInput"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Bad request
+
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get a booking by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateBooking
+      tags: [bookings]
+      summary: Update booking status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    delete:
+      operationId: deleteBooking
+      tags: [bookings]
+      summary: Cancel/delete a booking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /services:
+    get:
+      operationId: listServices
+      tags: [services]
+      summary: List all services
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+
+  /menu:
+    get:
+      operationId: listMenuItems
+      tags: [menu]
+      summary: List all menu items
+      responses:
+        "200":
+          description: Menu items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MenuItem"
+
+  /gallery:
+    get:
+      operationId: listGalleryItems
+      tags: [gallery]
+      summary: List gallery items
+      responses:
+        "200":
+          description: Gallery items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryItem"
+
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit a contact message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "201":
+          description: Message received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactMessage"
+        "400":
+          description: Bad request
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Get venue statistics
+      responses:
+        "200":
+          description: Venue statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VenueStats"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +213,103 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Booking:
+      type: object
+      required: [id, firstName, lastName, email, date, time, experienceType, status, createdAt]
+      properties:
+        id:          { type: integer }
+        firstName:   { type: string }
+        lastName:    { type: string }
+        email:       { type: string }
+        phone:       { type: ["string", "null"] }
+        date:        { type: string }
+        time:        { type: string }
+        experienceType: { type: string }
+        specialRequests: { type: ["string", "null"] }
+        status:      { type: string, enum: [pending, confirmed, cancelled] }
+        createdAt:   { type: string }
+
+    BookingInput:
+      type: object
+      required: [firstName, lastName, email, date, time, experienceType]
+      properties:
+        firstName:   { type: string, minLength: 1 }
+        lastName:    { type: string, minLength: 1 }
+        email:       { type: string, minLength: 1 }
+        phone:       { type: string }
+        date:        { type: string }
+        time:        { type: string }
+        experienceType: { type: string, minLength: 1 }
+        specialRequests: { type: string }
+
+    BookingUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [pending, confirmed, cancelled] }
+        specialRequests: { type: string }
+
+    Service:
+      type: object
+      required: [id, name, description, priceFrom, priceUnit, category]
+      properties:
+        id:          { type: integer }
+        name:        { type: string }
+        description: { type: string }
+        priceFrom:   { type: number }
+        priceUnit:   { type: string }
+        category:    { type: string }
+        featured:    { type: boolean }
+
+    MenuItem:
+      type: object
+      required: [id, name, description, price, category]
+      properties:
+        id:          { type: integer }
+        name:        { type: string }
+        description: { type: string }
+        price:       { type: number }
+        category:    { type: string, enum: [espresso, filter, cold, food, specialty] }
+        featured:    { type: boolean }
+
+    GalleryItem:
+      type: object
+      required: [id, title, category]
+      properties:
+        id:          { type: integer }
+        title:       { type: string }
+        category:    { type: string }
+        imageUrl:    { type: ["string", "null"] }
+
+    ContactInput:
+      type: object
+      required: [name, email, message]
+      properties:
+        name:    { type: string, minLength: 1 }
+        email:   { type: string, minLength: 1 }
+        subject: { type: string }
+        message: { type: string, minLength: 1 }
+
+    ContactMessage:
+      type: object
+      required: [id, name, email, message, createdAt]
+      properties:
+        id:        { type: integer }
+        name:      { type: string }
+        email:     { type: string }
+        subject:   { type: ["string", "null"] }
+        message:   { type: string }
+        createdAt: { type: string }
+
+    VenueStats:
+      type: object
+      required: [totalBookings, confirmedBookings, pendingBookings, totalTracks, memberCount, coffeeVarieties, yearsOpen]
+      properties:
+        totalBookings:     { type: integer }
+        confirmedBookings: { type: integer }
+        pendingBookings:   { type: integer }
+        totalTracks:       { type: integer }
+        memberCount:       { type: integer }
+        coffeeVarieties:   { type: integer }
+        yearsOpen:         { type: integer }

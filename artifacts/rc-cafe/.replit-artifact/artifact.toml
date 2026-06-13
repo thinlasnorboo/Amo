@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "RC Track Café"
+version = "1.0.0"
+id = "artifacts/rc-cafe"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23330
+
+[services.development]
+run = "pnpm --filter @workspace/rc-cafe run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/rc-cafe", "run", "build" ]
+publicDir = "artifacts/rc-cafe/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23330"
+BASE_PATH = "/"
