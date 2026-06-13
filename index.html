@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RC Track Café — Dubai Autodrome Circuit</title>
+  <title>LA RC Hub & Cafe — Premium RC Racing & Artisan Coffee</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
@@ -12,15 +12,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
-    /* ── DESIGN TOKENS (match React app CSS exactly) ── */
+    /* ── DESIGN TOKENS ── */
     :root {
       --bg:        hsl(0 0% 4%);
       --fg:        hsl(0 0% 98%);
-      --card:      hsl(0 0% 6%);
-      --border:    hsl(0 0% 12%);
-      --muted-fg:  hsl(0 0% 60%);
-      --primary:   hsl(44 55% 54%);
-      --primary-fg: hsl(0 0% 9%);
+      --card:      hsl(0 0% 7%);
+      --border:    hsl(0 0% 14%);
+      --muted-fg:  hsl(0 0% 58%);
+      --primary:   hsl(0 84% 60%);   /* RED */
+      --primary-fg: hsl(0 0% 100%);  /* WHITE on red */
       --input:     hsl(0 0% 16%);
       --sans: 'Inter', sans-serif;
       --serif: 'Playfair Display', Georgia, serif;
@@ -45,40 +45,36 @@
     /* ── LAYOUT ── */
     .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
     .container--narrow { max-width: 900px; margin: 0 auto; padding: 0 32px; }
-    .container--mid { max-width: 1000px; margin: 0 auto; padding: 0 32px; }
+    .container--mid { max-width: 1020px; margin: 0 auto; padding: 0 32px; }
 
     /* ── NAVBAR ── */
     #navbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 24px 0;
+      padding: 20px 0;
       transition: background var(--t), padding var(--t), border-color var(--t);
       border-bottom: 1px solid transparent;
     }
     #navbar.scrolled {
-      background: rgba(10,10,10,0.92);
+      background: rgba(10,10,10,0.94);
       backdrop-filter: blur(16px);
-      padding: 16px 0;
+      padding: 12px 0;
       border-color: var(--border);
     }
-    .nav-inner {
-      display: flex; align-items: center; justify-content: space-between;
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { display: flex; align-items: center; gap: 12px; }
+    .nav-logo-img {
+      width: 40px; height: 40px; border-radius: 50%;
+      overflow: hidden; border: 1.5px solid var(--primary); flex-shrink: 0;
+      transition: border-color var(--t);
     }
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--serif); font-size: 20px; letter-spacing: 0.08em;
+    .nav-logo-img img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-logo-text {
+      font-family: var(--serif); font-size: 18px; letter-spacing: 0.1em;
       color: var(--primary);
     }
-    .nav-logo-ring {
-      width: 32px; height: 32px;
-      border: 1px solid var(--primary); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 600;
-      transition: background var(--t), color var(--t);
-    }
-    .nav-logo:hover .nav-logo-ring { background: var(--primary); color: var(--primary-fg); }
-    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
     .nav-links a {
-      font-size: 12px; font-weight: 500; letter-spacing: 0.15em;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--muted-fg);
       transition: color var(--t);
     }
@@ -86,27 +82,19 @@
     .btn {
       display: inline-flex; align-items: center; justify-content: center;
       gap: 8px; cursor: pointer; border: none; font-family: var(--sans);
-      font-weight: 500; text-transform: uppercase; letter-spacing: 0.15em;
-      transition: background var(--t), color var(--t), opacity var(--t);
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;
+      transition: background var(--t), color var(--t), opacity var(--t), border-color var(--t);
       text-decoration: none;
     }
-    .btn-primary {
-      background: var(--primary); color: var(--primary-fg);
-      padding: 12px 32px; font-size: 12px;
-    }
+    .btn-primary { background: var(--primary); color: var(--primary-fg); padding: 12px 32px; font-size: 11px; }
     .btn-primary:hover { opacity: 0.88; }
-    .btn-outline {
-      background: transparent; color: var(--primary);
-      border: 1px solid var(--primary);
-      padding: 12px 32px; font-size: 12px;
-    }
-    .btn-outline:hover { background: rgba(201,168,76,0.1); }
-    .btn-lg { padding: 18px 40px; font-size: 12px; }
+    .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 12px 32px; font-size: 11px; }
+    .btn-outline:hover { background: rgba(239,68,68,0.1); }
+    .btn-lg { padding: 18px 40px; font-size: 11px; }
     .btn-full { width: 100%; }
-    .hamburger {
-      display: none; flex-direction: column; gap: 5px;
-      cursor: pointer; background: none; border: none; padding: 4px;
-    }
+
+    /* Hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
     .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--fg); transition: var(--t); }
     .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
@@ -116,367 +104,224 @@
     .mobile-drawer {
       display: none; position: fixed; inset: 0; z-index: 99;
       background: rgba(10,10,10,0.98); backdrop-filter: blur(20px);
-      flex-direction: column; align-items: flex-start;
-      justify-content: center; padding: 0 40px;
-      gap: 40px; opacity: 0; pointer-events: none; transition: opacity var(--t);
+      flex-direction: column; align-items: flex-start; justify-content: center;
+      padding: 0 40px; gap: 40px; opacity: 0; pointer-events: none; transition: opacity var(--t);
     }
     .mobile-drawer.open { opacity: 1; pointer-events: all; }
-    .mobile-drawer a {
-      font-family: var(--serif); font-size: 32px; color: var(--fg);
-      transition: color var(--t);
-    }
+    .mobile-drawer a { font-family: var(--serif); font-size: 32px; color: var(--fg); transition: color var(--t); }
     .mobile-drawer a:hover { color: var(--primary); }
 
-    /* ── PAGE NAV (tab bar) ── */
-    .page-nav {
-      position: sticky; top: 64px; z-index: 80;
-      background: var(--card); border-bottom: 1px solid var(--border);
-      overflow-x: auto;
-    }
-    .page-nav::-webkit-scrollbar { height: 0; }
-    .page-nav-inner {
-      display: flex; align-items: center;
-    }
-    .page-nav a {
-      padding: 16px 28px; font-size: 11px; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--muted-fg);
-      white-space: nowrap; border-bottom: 2px solid transparent;
-      transition: color var(--t), border-color var(--t);
-    }
-    .page-nav a:hover, .page-nav a.active {
-      color: var(--primary); border-color: var(--primary);
-    }
-
-    /* ── SECTION LABELS ── */
+    /* ── LABELS ── */
     .label {
-      font-family: var(--sans); font-size: 11px; font-weight: 500;
-      letter-spacing: 0.2em; text-transform: uppercase; color: var(--primary);
+      font-family: var(--sans); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--primary);
       display: block; margin-bottom: 20px;
-    }
-    .section-divider {
-      border: none; border-top: 1px solid var(--border);
     }
 
     /* ═══════════ HERO ═══════════ */
     #home {
-      position: relative; min-height: 92vh;
+      position: relative; min-height: 94vh;
       display: flex; align-items: center; justify-content: center;
       overflow: hidden; border-bottom: 1px solid var(--border);
     }
+    /* Logo watermark background */
+    .hero-bg-logo {
+      position: absolute; inset: 0;
+      background-image: url('logo.jpeg');
+      background-size: 44%; background-position: center;
+      background-repeat: no-repeat; opacity: 0.07;
+      pointer-events: none;
+    }
     .hero-glow {
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 65%);
+      background: radial-gradient(ellipse at center, rgba(239,68,68,0.08) 0%, transparent 65%);
       pointer-events: none;
     }
     .hero-content {
-      text-align: center; max-width: 840px; padding: 120px 24px 80px;
+      text-align: center; max-width: 860px; padding: 120px 24px 80px;
       position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center;
     }
+    .hero-logo-ring {
+      width: 112px; height: 112px; border-radius: 50%;
+      overflow: hidden; border: 2px solid var(--primary);
+      margin-bottom: 28px;
+      box-shadow: 0 0 56px rgba(239,68,68,0.22);
+    }
+    .hero-logo-ring img { width: 100%; height: 100%; object-fit: cover; }
     .hero-content h1 {
-      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-size: clamp(3.4rem, 9vw, 7rem);
       line-height: 1.06; letter-spacing: -0.01em;
-      color: var(--fg); margin-bottom: 32px;
+      color: var(--fg); margin-bottom: 28px;
     }
-    .hero-content h1 em {
-      font-style: italic; color: var(--muted-fg);
-    }
-    .hero-content p {
-      font-size: 18px; font-weight: 300; color: var(--muted-fg);
-      max-width: 560px; margin: 0 auto 48px; line-height: 1.75;
-    }
+    .hero-content h1 em { font-style: italic; color: var(--muted-fg); }
+    .hero-content p { font-size: 18px; font-weight: 300; color: var(--muted-fg); max-width: 560px; margin: 0 auto 48px; line-height: 1.75; }
     .hero-cta { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 
-    /* ── STATS BAR ── */
-    .stats-bar {
-      background: var(--card); border-bottom: 1px solid var(--border); padding: 48px 0;
-    }
-    .stats-grid {
-      display: grid; grid-template-columns: repeat(4,1fr);
-    }
-    .stat-item {
-      text-align: center; padding: 0 32px;
-      border-right: 1px solid var(--border);
-    }
+    /* ── STATS ── */
+    .stats-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 48px 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+    .stat-item { text-align: center; padding: 0 32px; border-right: 1px solid var(--border); position: relative; }
+    .stat-item::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 32px; height: 2px; background: var(--primary); opacity: 0.5; }
     .stat-item:last-child { border-right: none; }
-    .stat-num {
-      font-family: var(--serif); font-size: 3rem; color: var(--primary);
-      display: block; line-height: 1; margin-bottom: 10px;
-    }
-    .stat-label {
-      font-size: 10px; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--muted-fg);
-    }
+    .stat-num { font-family: var(--serif); font-size: 3rem; color: var(--primary); display: block; line-height: 1; margin-bottom: 10px; margin-top: 12px; }
+    .stat-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted-fg); }
 
-    /* ── BRAND STORY ── */
+    /* ── ABOUT ── */
     #about { padding: 100px 0; }
-    .about-inner { max-width: 700px; margin: 0 auto; text-align: center; }
-    .about-inner h2 { font-size: 2.4rem; color: var(--fg); margin-bottom: 28px; }
-    .about-inner p {
-      font-size: 17px; font-weight: 300; color: var(--muted-fg);
-      line-height: 1.9; margin-bottom: 20px;
-    }
-    .about-inner p:last-child { margin-bottom: 0; }
+    .about-inner { max-width: 720px; margin: 0 auto; text-align: center; }
+    .about-inner h2 { font-size: 2.5rem; color: var(--fg); margin-bottom: 28px; }
+    .about-inner p { font-size: 17px; font-weight: 300; color: var(--muted-fg); line-height: 1.9; margin-bottom: 20px; }
 
     /* ── SERVICES ── */
     #services {
       padding: 100px 0; background: var(--card);
       border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
     }
-    .section-head {
-      display: flex; align-items: flex-end; justify-content: space-between;
-      margin-bottom: 56px; gap: 20px; flex-wrap: wrap;
-    }
-    .section-head h2 { font-size: 2.5rem; color: var(--fg); }
-    .services-grid {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 24px;
-    }
+    .section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; gap: 20px; flex-wrap: wrap; }
+    .section-head h2 { font-size: 2.6rem; color: var(--fg); }
+    .services-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); }
     .service-card {
-      background: var(--bg); border: 1px solid var(--border);
-      display: flex; flex-direction: column; overflow: hidden;
-      transition: border-color var(--t);
-      position: relative;
+      background: var(--bg); display: flex; flex-direction: column;
+      position: relative; transition: background var(--t);
     }
-    .service-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 2px; background: var(--border);
-      transition: background var(--t);
-    }
-    .service-card:hover { border-color: rgba(201,168,76,0.4); }
-    .service-card:hover::before { background: var(--primary); }
-    .service-card-inner {
-      padding: 36px; flex: 1; display: flex; flex-direction: column;
-      position: relative;
-    }
-    .service-featured-dot {
-      position: absolute; top: 36px; right: 36px;
-      width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
-    }
-    .service-cat {
-      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--muted-fg); margin-bottom: 16px;
-    }
-    .service-card h3 { font-size: 1.6rem; color: var(--fg); margin-bottom: 16px; }
-    .service-card p {
-      font-size: 14px; font-weight: 300; color: var(--muted-fg);
-      line-height: 1.8; flex: 1; margin-bottom: 28px;
-    }
-    .service-footer {
-      padding-top: 24px; border-top: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: flex-end;
-    }
-    .service-from {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;
-      color: var(--muted-fg); display: block; margin-bottom: 4px;
-    }
-    .service-price { font-family: var(--serif); font-size: 1.6rem; color: var(--fg); }
-    .service-unit {
-      font-size: 10px; font-family: var(--sans); text-transform: uppercase;
-      letter-spacing: 0.15em; color: var(--muted-fg); vertical-align: middle;
-    }
-    .service-arrow { color: var(--primary); font-size: 18px; }
+    .service-card:hover { background: hsl(0 0% 5%); }
+    .service-top-bar { height: 2px; background: var(--border); transition: background var(--t); }
+    .service-card:hover .service-top-bar { background: var(--primary); }
+    .service-card-inner { padding: 36px 32px; flex: 1; display: flex; flex-direction: column; position: relative; }
+    .service-featured-dot { position: absolute; top: 32px; right: 32px; width: 7px; height: 7px; border-radius: 50%; background: var(--primary); }
+    .service-cat { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted-fg); margin-bottom: 14px; }
+    .service-card h3 { font-size: 1.55rem; color: var(--fg); margin-bottom: 14px; }
+    .service-card p { font-size: 14px; font-weight: 300; color: var(--muted-fg); line-height: 1.8; flex: 1; margin-bottom: 28px; }
+    .service-footer { padding-top: 22px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
+    .service-from { font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted-fg); display: block; margin-bottom: 4px; }
+    .service-price { font-family: var(--serif); font-size: 1.5rem; color: var(--fg); }
+    .service-unit { font-size: 10px; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted-fg); }
+    .service-arrow { color: var(--primary); font-size: 18px; opacity: 0.7; }
 
     /* ── MENU ── */
     #menu { padding: 100px 0; }
     .menu-section { margin-bottom: 80px; }
     .menu-section:last-child { margin-bottom: 0; }
-    .menu-section-head {
-      display: flex; align-items: center; gap: 24px; margin-bottom: 40px;
-    }
-    .menu-section-head h2 { font-size: 2rem; color: var(--fg); text-transform: capitalize; white-space: nowrap; }
+    .menu-section-head { display: flex; align-items: center; gap: 24px; margin-bottom: 40px; }
+    .menu-section-head h2 { font-size: 2rem; color: var(--fg); white-space: nowrap; }
     .menu-divider { flex: 1; height: 1px; background: var(--border); }
     .menu-items { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 64px; }
     .menu-item { position: relative; }
-    .menu-item-featured { position: absolute; left: -16px; top: 4px; color: var(--primary); font-size: 10px; }
+    .menu-item-featured { position: absolute; left: -16px; top: 3px; color: var(--primary); font-size: 10px; }
     .menu-item-top { display: flex; align-items: baseline; margin-bottom: 8px; }
-    .menu-item-name { font-family: var(--serif); font-size: 17px; color: var(--fg); }
-    .menu-item-dots {
-      flex: 1; border-bottom: 1px dotted rgba(255,255,255,0.15);
-      margin: 0 16px; position: relative; top: -4px;
-    }
-    .menu-item-price { font-size: 15px; font-weight: 500; color: var(--fg); }
+    .menu-item-name { font-family: var(--serif); font-size: 17px; color: var(--fg); transition: color var(--t); }
+    .menu-item:hover .menu-item-name { color: var(--primary); }
+    .menu-item-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,0.12); margin: 0 16px; position: relative; top: -4px; }
+    .menu-item-price { font-size: 14px; font-weight: 500; color: var(--fg); }
     .menu-item-desc { font-size: 13px; font-weight: 300; color: var(--muted-fg); line-height: 1.7; }
 
     /* ── GALLERY ── */
-    #gallery {
-      padding: 100px 0; background: var(--card);
-      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    }
+    #gallery { padding: 100px 0; background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .gallery-page-head { text-align: center; max-width: 600px; margin: 0 auto 64px; }
     .gallery-page-head h2 { font-size: 3.5rem; color: var(--fg); margin-bottom: 16px; }
     .gallery-page-head p { font-size: 16px; font-weight: 300; color: var(--muted-fg); }
-    .gallery-columns {
-      columns: 4; column-gap: 16px;
-    }
-    .gallery-item {
-      break-inside: avoid; margin-bottom: 16px; overflow: hidden;
-      background: var(--bg); border: 1px solid var(--border);
-      position: relative; cursor: pointer;
-    }
+    .gallery-columns { columns: 4; column-gap: 14px; }
+    .gallery-item { break-inside: avoid; margin-bottom: 14px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); position: relative; cursor: pointer; }
     .gallery-item:nth-child(3n+1) .gallery-thumb { aspect-ratio: 1/1; }
     .gallery-item:nth-child(3n+2) .gallery-thumb { aspect-ratio: 3/4; }
     .gallery-item:nth-child(3n)   .gallery-thumb { aspect-ratio: 4/3; }
-    .gallery-thumb {
-      width: 100%; background: var(--input);
-      display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
-    }
-    .gallery-placeholder {
-      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--muted-fg); opacity: 0.4;
-    }
-    .gallery-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.2) 40%, transparent 70%);
-      opacity: 0; transition: opacity 0.4s ease;
-      display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
-    }
+    .gallery-thumb { width: 100%; background: var(--input); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .gallery-placeholder { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-fg); opacity: 0.3; text-align: center; padding: 16px; }
+    .gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.15) 45%, transparent 70%); opacity: 0; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px; }
     .gallery-item:hover .gallery-overlay { opacity: 1; }
-    .gallery-overlay-cat {
-      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--primary); margin-bottom: 6px;
-    }
-    .gallery-overlay-title { font-family: var(--serif); font-size: 16px; color: var(--fg); }
+    .gallery-overlay-cat { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--primary); margin-bottom: 5px; }
+    .gallery-overlay-title { font-family: var(--serif); font-size: 15px; color: var(--fg); }
 
     /* ── BOOKING ── */
     #booking { padding: 100px 0; }
-    .booking-head { text-align: center; max-width: 700px; margin: 0 auto 64px; }
-    .booking-head h2 { font-size: 3.2rem; color: var(--fg); margin-bottom: 16px; }
+    .booking-head { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+    .booking-head h2 { font-size: 3rem; color: var(--fg); margin-bottom: 16px; }
     .booking-head p { font-size: 16px; font-weight: 300; color: var(--muted-fg); line-height: 1.75; }
-    .booking-form-wrap { max-width: 720px; margin: 0 auto; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
-    .form-group label {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--muted-fg);
-    }
+    .booking-form-wrap { max-width: 700px; margin: 0 auto; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .form-group label { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-fg); }
     .form-group input, .form-group select, .form-group textarea {
       background: var(--card); border: 1px solid var(--border); color: var(--fg);
-      font-family: var(--sans); font-size: 13px; text-transform: uppercase;
-      padding: 14px 16px; outline: none; transition: border-color var(--t);
+      font-family: var(--sans); font-size: 13px;
+      padding: 13px 16px; outline: none; transition: border-color var(--t);
       -webkit-appearance: none; border-radius: 0; height: 48px;
     }
-    .form-group textarea { height: auto; min-height: 120px; resize: none; }
+    .form-group textarea { height: auto; min-height: 110px; resize: none; }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
-    .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.18); }
     .form-group select option { background: var(--card); }
-    .form-error { font-size: 11px; color: hsl(0 84% 60%); margin-top: 4px; display: none; }
 
-    /* Booking success */
-    .booking-success {
-      display: none; text-align: center; padding: 80px 32px;
-      max-width: 480px; margin: 0 auto;
-    }
+    /* Success states */
+    .booking-success { display: none; text-align: center; padding: 80px 24px; max-width: 480px; margin: 0 auto; }
     .booking-success.show { display: block; }
-    .booking-success .check-ring {
-      width: 80px; height: 80px; border: 1px solid var(--primary); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; margin: 0 auto 32px;
-      color: var(--primary);
-    }
-    .booking-success h2 { font-size: 2.4rem; color: var(--fg); margin-bottom: 16px; }
-    .booking-success p { font-size: 15px; color: var(--muted-fg); font-weight: 300; line-height: 1.8; margin-bottom: 32px; }
-    .booking-form-wrap.hidden { display: none; }
+    .check-ring { width: 80px; height: 80px; border: 1px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; color: var(--primary); }
+    .booking-success h2 { font-size: 2.2rem; color: var(--fg); margin-bottom: 14px; }
+    .booking-success p { font-size: 14px; color: var(--muted-fg); font-weight: 300; line-height: 1.8; margin-bottom: 28px; }
+    .booking-form-wrap.hidden, .contact-form-box.hidden { display: none; }
 
-    /* ── CONTACT ── */
-    #contact {
-      padding: 100px 0; background: var(--card);
-      border-top: 1px solid var(--border);
-    }
-    .contact-page-head { max-width: 700px; margin-bottom: 64px; }
-    .contact-page-head h2 { font-size: 3.5rem; color: var(--fg); }
+    /* ── CONTACT & LOCATION ── */
+    #contact { padding: 100px 0; background: var(--card); border-top: 1px solid var(--border); }
+    .contact-head { margin-bottom: 64px; }
+    .contact-head h2 { font-size: 3.5rem; color: var(--fg); }
     .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
     .contact-info-blocks { display: flex; flex-direction: column; gap: 44px; }
-    .contact-block h4 {
-      font-family: var(--sans); font-size: 10px; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--muted-fg); margin-bottom: 16px;
-    }
-    .contact-block address {
-      font-style: normal; font-family: var(--serif); font-size: 18px;
-      color: var(--fg); line-height: 1.6;
-    }
+    .contact-block h4 { font-family: var(--sans); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted-fg); margin-bottom: 14px; }
+    .contact-block address { font-style: normal; font-family: var(--serif); font-size: 18px; color: var(--fg); line-height: 1.6; }
+    .contact-block address a:hover { color: var(--primary); }
     .hours-list { list-style: none; }
-    .hours-list li {
-      display: flex; justify-content: space-between;
-      padding-bottom: 10px; margin-bottom: 10px;
-      border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 300;
-    }
+    .hours-list li { display: flex; justify-content: space-between; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 300; max-width: 260px; }
     .hours-list li:last-child { border-bottom: none; }
-    .hours-time { font-size: 13px; color: var(--fg); }
-    .contact-direct { font-size: 15px; font-weight: 300; }
-    .contact-direct span { color: var(--muted-fg); margin-right: 16px; }
+    .hours-time { font-size: 13px; color: var(--fg); font-family: monospace; }
+    .contact-direct { font-size: 15px; font-weight: 300; margin-bottom: 10px; }
+    .contact-direct span { color: var(--muted-fg); margin-right: 14px; }
     .contact-direct a { color: var(--fg); transition: color var(--t); }
     .contact-direct a:hover { color: var(--primary); }
-    .contact-form-box {
-      background: var(--bg); border: 1px solid var(--border); padding: 40px;
-    }
-    .contact-success {
-      display: none; text-align: center; padding: 60px 24px;
-    }
+
+    /* Social badges */
+    .social-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .social-badge { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border: 1px solid var(--border); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-fg); transition: border-color var(--t), color var(--t); }
+    .social-badge:hover { border-color: var(--primary); color: var(--primary); }
+    .social-badge svg { flex-shrink: 0; }
+
+    /* Map */
+    .map-embed { border: 1px solid var(--border); overflow: hidden; height: 240px; margin-top: 36px; }
+    .map-embed iframe { width: 100%; height: 100%; border: 0; filter: grayscale(80%) invert(88%) contrast(85%); }
+
+    /* Contact form box */
+    .contact-form-box { background: var(--bg); border: 1px solid var(--border); padding: 40px; }
+    .contact-success { display: none; text-align: center; padding: 56px 24px; }
     .contact-success.show { display: block; }
-    .contact-success .check-ring {
-      width: 64px; height: 64px; border: 1px solid var(--primary); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;
-      color: var(--primary);
-    }
-    .contact-success h3 { font-size: 1.8rem; color: var(--fg); margin-bottom: 12px; }
+    .contact-success .check-ring-sm { width: 64px; height: 64px; border: 1px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--primary); }
+    .contact-success h3 { font-family: var(--serif); font-size: 1.8rem; color: var(--fg); margin-bottom: 12px; }
     .contact-success p { font-size: 14px; color: var(--muted-fg); font-weight: 300; margin-bottom: 24px; }
-    .contact-form-box.hidden { display: none; }
+
+    /* ── CTA BANNER ── */
+    .cta-banner { padding: 96px 0; position: relative; overflow: hidden; border-top: 1px solid var(--border); }
+    .cta-banner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(239,68,68,0.06) 0%, transparent 60%); pointer-events: none; }
+    .cta-banner-inner { text-align: center; max-width: 600px; margin: 0 auto; position: relative; }
+    .cta-banner h2 { font-size: 2.8rem; color: var(--fg); margin-bottom: 18px; }
+    .cta-banner p { font-size: 16px; font-weight: 300; color: var(--muted-fg); margin-bottom: 40px; line-height: 1.75; }
 
     /* ── FOOTER ── */
-    footer {
-      background: var(--bg); border-top: 1px solid var(--border);
-      padding: 64px 0 32px;
-    }
-    .footer-grid {
-      display: grid; grid-template-columns: 2fr 1fr 1fr;
-      gap: 64px; margin-bottom: 48px;
-    }
-    .footer-brand .foot-logo {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--serif); font-size: 18px; letter-spacing: 0.08em;
-      color: var(--primary); margin-bottom: 20px;
-    }
-    .footer-brand .foot-logo-ring {
-      width: 28px; height: 28px; border: 1px solid var(--primary); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 11px;
-    }
+    footer { background: var(--bg); border-top: 1px solid var(--border); padding: 64px 0 32px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 64px; margin-bottom: 48px; }
+    .foot-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .foot-logo-img { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; border: 1.5px solid var(--primary); flex-shrink: 0; }
+    .foot-logo-img img { width: 100%; height: 100%; object-fit: cover; }
+    .foot-logo-text { font-family: var(--serif); font-size: 17px; letter-spacing: 0.08em; color: var(--primary); }
     .footer-brand p { font-size: 13px; color: var(--muted-fg); line-height: 1.8; max-width: 280px; }
-    .footer-col h4 {
-      font-family: var(--sans); font-size: 11px; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--fg); margin-bottom: 24px;
-    }
+    .footer-col h4 { font-family: var(--sans); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg); margin-bottom: 22px; }
     .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
     .footer-col ul a { font-size: 13px; color: var(--muted-fg); transition: color var(--t); }
     .footer-col ul a:hover { color: var(--primary); }
-    .footer-bottom {
-      border-top: 1px solid var(--border); padding-top: 28px;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-    }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
     .footer-bottom p { font-size: 11px; color: var(--muted-fg); letter-spacing: 0.1em; text-transform: uppercase; }
 
     /* ── ANIMATIONS ── */
     .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
     .fade-up.in { opacity: 1; transform: translateY(0); }
-    .fade-up:nth-child(2) { transition-delay: 0.1s; }
-    .fade-up:nth-child(3) { transition-delay: 0.2s; }
-    .fade-up:nth-child(4) { transition-delay: 0.3s; }
-    .fade-up:nth-child(5) { transition-delay: 0.4s; }
-    .fade-up:nth-child(6) { transition-delay: 0.5s; }
-
-    /* ── CTA BANNER ── */
-    .cta-banner {
-      padding: 100px 0; position: relative; overflow: hidden;
-      border-top: 1px solid var(--border);
-    }
-    .cta-banner::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(201,168,76,0.05) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .cta-banner-inner {
-      text-align: center; max-width: 600px; margin: 0 auto; position: relative;
-    }
-    .cta-banner h2 { font-size: 2.8rem; color: var(--fg); margin-bottom: 20px; }
-    .cta-banner p { font-size: 16px; font-weight: 300; color: var(--muted-fg); margin-bottom: 40px; line-height: 1.75; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 1024px) {
@@ -489,39 +334,39 @@
       .nav-links, .nav-reserve { display: none; }
       .hamburger { display: flex; }
       .mobile-drawer { display: flex; }
-      .services-grid { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; background: transparent; gap: 1px; }
       .stats-grid { grid-template-columns: 1fr 1fr; }
-      .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 16px; }
-      .stat-item:nth-child(2n) { }
-      .stat-item:last-child { border-bottom: none; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 20px 16px; }
+      .stat-item:nth-child(even) { border-left: 1px solid var(--border); }
+      .stat-item:nth-last-child(-n+2) { border-bottom: none; }
       .menu-items { grid-template-columns: 1fr; }
       .gallery-columns { columns: 2; }
       .contact-grid { grid-template-columns: 1fr; gap: 48px; }
-      .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 36px; }
       .hero-content h1 { font-size: clamp(2.8rem, 12vw, 5rem); }
       .form-row { grid-template-columns: 1fr; }
-      .booking-head h2, .gallery-page-head h2 { font-size: 2.4rem; }
-      .contact-page-head h2 { font-size: 2.4rem; }
-      .section-head { flex-direction: column; align-items: flex-start; }
     }
     @media (max-width: 480px) {
       .gallery-columns { columns: 1; }
-      #home, #services, #menu, #gallery, #booking, #contact { padding-top: 80px; }
-      .stats-grid { grid-template-columns: 1fr; }
+      .hero-logo-ring { width: 88px; height: 88px; }
       .contact-form-box { padding: 24px; }
       .hero-cta { flex-direction: column; align-items: center; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-item:nth-child(even) { border-left: none; }
+      .stat-item:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══════════ NAVBAR ═══════════ -->
+<!-- ═══ NAVBAR ═══ -->
 <nav id="navbar">
   <div class="container">
     <div class="nav-inner">
       <a href="#home" class="nav-logo">
-        <span class="nav-logo-ring">R</span>
-        RC TRACK CAFÉ
+        <div class="nav-logo-img"><img src="logo.jpeg" alt="LA RC Hub & Cafe" /></div>
+        <span class="nav-logo-text">LA RC HUB &amp; CAFE</span>
       </a>
       <ul class="nav-links">
         <li><a href="#home" class="active">Home</a></li>
@@ -530,10 +375,8 @@
         <li><a href="#gallery">Gallery</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
-      <a href="#booking" class="btn btn-primary nav-reserve" style="font-size:11px;padding:10px 24px;">Reserve Now</a>
-      <button class="hamburger" id="ham" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="#booking" class="btn btn-primary nav-reserve" style="font-size:11px;padding:10px 22px;">Reserve Now</a>
+      <button class="hamburger" id="ham" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
@@ -548,11 +391,13 @@
   <a href="#booking" class="btn btn-primary btn-lg" onclick="closeDrw()" style="margin-top:8px;">Reserve Now</a>
 </div>
 
-<!-- ═══════════ HERO ═══════════ -->
+<!-- ═══ HERO ═══ -->
 <section id="home">
+  <div class="hero-bg-logo"></div>
   <div class="hero-glow"></div>
   <div class="hero-content">
-    <span class="label">Dubai Autodrome Circuit</span>
+    <div class="hero-logo-ring"><img src="logo.jpeg" alt="LA RC Hub & Cafe" /></div>
+    <span class="label" style="margin-bottom:16px;">LA RC Hub &amp; Cafe</span>
     <h1>Precision.<br><em>Passion.</em><br>Coffee.</h1>
     <p>An exclusive sanctuary where high-performance RC motorsport meets artisanal coffee culture.</p>
     <div class="hero-cta">
@@ -562,42 +407,31 @@
   </div>
 </section>
 
-<!-- ═══════════ STATS BAR ═══════════ -->
+<!-- ═══ STATS ═══ -->
 <div class="stats-bar">
   <div class="container">
     <div class="stats-grid">
-      <div class="stat-item fade-up">
-        <span class="stat-num" data-target="12">0</span>
-        <span class="stat-label">Pro Tracks</span>
-      </div>
-      <div class="stat-item fade-up">
-        <span class="stat-num" data-target="47">0</span>
-        <span class="stat-label">Single Origins</span>
-      </div>
-      <div class="stat-item fade-up">
-        <span class="stat-num" data-target="5000" data-suffix="+">0</span>
-        <span class="stat-label">Club Members</span>
-      </div>
-      <div class="stat-item fade-up">
-        <span class="stat-num" data-target="6">0</span>
-        <span class="stat-label">Years of Excellence</span>
-      </div>
+      <div class="stat-item fade-up"><span class="stat-num" data-target="12">0</span><span class="stat-label">Pro Tracks</span></div>
+      <div class="stat-item fade-up"><span class="stat-num" data-target="47">0</span><span class="stat-label">Single Origins</span></div>
+      <div class="stat-item fade-up"><span class="stat-num" data-target="5000" data-suffix="+">0</span><span class="stat-label">Club Members</span></div>
+      <div class="stat-item fade-up"><span class="stat-num" data-target="6">0</span><span class="stat-label">Years of Excellence</span></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ ABOUT ═══════════ -->
+<!-- ═══ ABOUT ═══ -->
 <section id="about">
   <div class="container">
     <div class="about-inner fade-up">
-      <h2>The RC Track Café Experience</h2>
-      <p>Founded on a shared obsession for mechanical perfection and exceptional coffee, RC Track Café is Dubai's first venue to bridge the gap between high-end motorsport and artisanal café culture.</p>
-      <p>Our tracks are meticulously designed for 1:10 and 1:28 scale racing, featuring telemetry timing systems and VIP pit areas. Meanwhile, our baristas pull espresso shots from rare single-origin beans, ensuring that whether you're behind the transmitter or a cup of coffee, you experience nothing but the best.</p>
+      <span class="label">Our Story</span>
+      <h2>The LA RC Hub &amp; Cafe Experience</h2>
+      <p>Founded on a shared obsession for mechanical perfection and exceptional coffee, LA RC Hub &amp; Cafe is the region's first venue to bridge the gap between high-end RC motorsport and artisanal café culture.</p>
+      <p>Our tracks are meticulously designed for precision racing with telemetry timing systems and VIP pit areas. Meanwhile, our baristas pull espresso shots from rare single-origin beans — ensuring that whether you're behind the transmitter or a cup of coffee, you experience nothing but the best.</p>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ SERVICES ═══════════ -->
+<!-- ═══ SERVICES ═══ -->
 <section id="services">
   <div class="container">
     <div class="section-head">
@@ -609,94 +443,77 @@
     </div>
     <div class="services-grid">
       <div class="service-card fade-up">
+        <div class="service-top-bar"></div>
         <div class="service-card-inner">
           <div class="service-featured-dot"></div>
           <span class="service-cat">Racing</span>
           <h3>RC Track Racing</h3>
           <p>Take to our championship-grade circuit in a professionally maintained 1:10 scale RC car. Solo sessions or head-to-head racing with real-time lap timing and leaderboards.</p>
           <div class="service-footer">
-            <div>
-              <span class="service-from">Starting from</span>
-              <span class="service-price">AED 85 <span class="service-unit">/ 30 min</span></span>
-            </div>
+            <div><span class="service-from">Starting from</span><span class="service-price">AED 85 <span class="service-unit">/ 30 min</span></span></div>
             <span class="service-arrow">&rarr;</span>
           </div>
         </div>
       </div>
-
       <div class="service-card fade-up">
+        <div class="service-top-bar"></div>
         <div class="service-card-inner">
           <div class="service-featured-dot"></div>
           <span class="service-cat">Café</span>
           <h3>Artisan Coffee Bar</h3>
           <p>Explore 47 signature beverages crafted by our award-winning baristas. From Ethiopian single-origin pour-overs to house-blend espresso creations — every cup is a masterpiece.</p>
           <div class="service-footer">
-            <div>
-              <span class="service-from">Starting from</span>
-              <span class="service-price">AED 28 <span class="service-unit">/ cup</span></span>
-            </div>
+            <div><span class="service-from">Starting from</span><span class="service-price">AED 28 <span class="service-unit">/ cup</span></span></div>
             <span class="service-arrow">&rarr;</span>
           </div>
         </div>
       </div>
-
       <div class="service-card fade-up">
+        <div class="service-top-bar"></div>
         <div class="service-card-inner">
           <div class="service-featured-dot"></div>
           <span class="service-cat">Events</span>
           <h3>Private Events</h3>
           <p>Transform our venue into your exclusive domain. Corporate events, birthday celebrations, team-building experiences, and product launches — all elevated to extraordinary.</p>
           <div class="service-footer">
-            <div>
-              <span class="service-from">Starting from</span>
-              <span class="service-price">AED 3,500 <span class="service-unit">/ event</span></span>
-            </div>
+            <div><span class="service-from">Starting from</span><span class="service-price">AED 3,500 <span class="service-unit">/ event</span></span></div>
             <span class="service-arrow">&rarr;</span>
           </div>
         </div>
       </div>
-
       <div class="service-card fade-up">
+        <div class="service-top-bar"></div>
         <div class="service-card-inner">
           <span class="service-cat">Racing</span>
           <h3>Coaching &amp; Clinics</h3>
           <p>Elevate your racing technique with one-on-one coaching from our resident racing experts. From novice orientation to advanced cornering mastery — tailored to your level.</p>
           <div class="service-footer">
-            <div>
-              <span class="service-from">Starting from</span>
-              <span class="service-price">AED 200 <span class="service-unit">/ session</span></span>
-            </div>
+            <div><span class="service-from">Starting from</span><span class="service-price">AED 200 <span class="service-unit">/ session</span></span></div>
             <span class="service-arrow">&rarr;</span>
           </div>
         </div>
       </div>
-
       <div class="service-card fade-up">
+        <div class="service-top-bar"></div>
         <div class="service-card-inner">
           <span class="service-cat">Workshop</span>
           <h3>RC Car Customisation</h3>
           <p>Our in-house workshop offers full vehicle customisation — body kits, performance tuning, paint schemes, and livery design. Drive something that's unmistakably yours.</p>
           <div class="service-footer">
-            <div>
-              <span class="service-from">Starting from</span>
-              <span class="service-price">AED 450 <span class="service-unit">/ package</span></span>
-            </div>
+            <div><span class="service-from">Starting from</span><span class="service-price">AED 450 <span class="service-unit">/ package</span></span></div>
             <span class="service-arrow">&rarr;</span>
           </div>
         </div>
       </div>
-
       <div class="service-card fade-up">
+        <div class="service-top-bar"></div>
         <div class="service-card-inner">
           <div class="service-featured-dot"></div>
           <span class="service-cat">Racing</span>
           <h3>Championship League</h3>
           <p>Compete in our monthly ranked championship series. Track records, podium ceremonies, exclusive member pricing, and a trophy cabinet awaiting the bold and the fast.</p>
           <div class="service-footer">
-            <div>
-              <span class="service-from">Membership from</span>
-              <span class="service-price">AED 320 <span class="service-unit">/ month</span></span>
-            </div>
+            <div><span class="service-from">Membership from</span><span class="service-price">AED 320 <span class="service-unit">/ month</span></span></div>
             <span class="service-arrow">&rarr;</span>
           </div>
         </div>
@@ -705,140 +522,66 @@
   </div>
 </section>
 
-<!-- ═══════════ MENU ═══════════ -->
+<!-- ═══ MENU ═══ -->
 <section id="menu">
   <div class="container--mid">
     <div class="fade-up" style="margin-bottom:64px;">
       <span class="label">The Café</span>
-      <h2 style="font-size:3rem;color:var(--fg);margin-bottom:16px;">Artisan Menu</h2>
-      <p style="font-size:17px;font-weight:300;color:var(--muted-fg);max-width:540px;line-height:1.8;">Sourced globally, roasted locally, extracted perfectly. Our coffee program is as engineered as the machines on our tracks.</p>
+      <h2 style="font-size:3rem;color:var(--fg);margin-bottom:14px;">Artisan Menu</h2>
+      <p style="font-size:17px;font-weight:300;color:var(--muted-fg);max-width:540px;line-height:1.8;">Sourced globally, roasted locally, extracted perfectly.</p>
     </div>
 
-    <!-- Espresso -->
     <div class="menu-section fade-up">
-      <div class="menu-section-head">
-        <h2>Espresso</h2>
-        <div class="menu-divider"></div>
-      </div>
+      <div class="menu-section-head"><h2>Espresso</h2><div class="menu-divider"></div></div>
       <div class="menu-items">
-        <div class="menu-item"><div class="menu-item-featured">&#9670;</div>
-          <div class="menu-item-top"><span class="menu-item-name">Signature Espresso</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 28</span></div>
-          <p class="menu-item-desc">Our house-blend double shot — rich, syrupy, with a hazelnut finish.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Flat White</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 32</span></div>
-          <p class="menu-item-desc">Silky microfoam over a double ristretto. Precision in every pour.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Macchiato</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 30</span></div>
-          <p class="menu-item-desc">A bold espresso marked with the finest steamed milk. Classic and uncompromising.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Cortado</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 30</span></div>
-          <p class="menu-item-desc">Equal parts espresso and warm milk — balanced, smooth, confident.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Long Black</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 28</span></div>
-          <p class="menu-item-desc">Hot water over a double espresso. The purist's choice.</p>
-        </div>
+        <div class="menu-item"><div class="menu-item-featured">&#9670;</div><div class="menu-item-top"><span class="menu-item-name">Signature Espresso</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 28</span></div><p class="menu-item-desc">Our house-blend double shot — rich, syrupy, with a hazelnut finish.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Flat White</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 32</span></div><p class="menu-item-desc">Silky microfoam over a double ristretto. Precision in every pour.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Macchiato</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 30</span></div><p class="menu-item-desc">A bold espresso marked with the finest steamed milk.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Cortado</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 30</span></div><p class="menu-item-desc">Equal parts espresso and warm milk — balanced, smooth, confident.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Long Black</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 28</span></div><p class="menu-item-desc">Hot water over a double espresso. The purist's choice.</p></div>
       </div>
     </div>
 
-    <!-- Filter -->
     <div class="menu-section fade-up">
-      <div class="menu-section-head">
-        <h2>Filter</h2>
-        <div class="menu-divider"></div>
-      </div>
+      <div class="menu-section-head"><h2>Filter</h2><div class="menu-divider"></div></div>
       <div class="menu-items">
-        <div class="menu-item"><div class="menu-item-featured">&#9670;</div>
-          <div class="menu-item-top"><span class="menu-item-name">Ethiopian Pour-Over</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 45</span></div>
-          <p class="menu-item-desc">Yirgacheffe single origin. Notes of jasmine, blueberry, and lemon zest.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Colombian V60</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 42</span></div>
-          <p class="menu-item-desc">Huila region. Chocolate, caramel, and a lingering stone-fruit sweetness.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Kenyan Chemex</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 44</span></div>
-          <p class="menu-item-desc">Nyeri highlands. Blackcurrant and grapefruit brightness in a clean cup.</p>
-        </div>
+        <div class="menu-item"><div class="menu-item-featured">&#9670;</div><div class="menu-item-top"><span class="menu-item-name">Ethiopian Pour-Over</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 45</span></div><p class="menu-item-desc">Yirgacheffe single origin. Notes of jasmine, blueberry, and lemon zest.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Colombian V60</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 42</span></div><p class="menu-item-desc">Huila region. Chocolate, caramel, and a lingering stone-fruit sweetness.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Kenyan Chemex</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 44</span></div><p class="menu-item-desc">Nyeri highlands. Blackcurrant and grapefruit brightness in a clean cup.</p></div>
       </div>
     </div>
 
-    <!-- Cold -->
     <div class="menu-section fade-up">
-      <div class="menu-section-head">
-        <h2>Cold</h2>
-        <div class="menu-divider"></div>
-      </div>
+      <div class="menu-section-head"><h2>Cold</h2><div class="menu-divider"></div></div>
       <div class="menu-items">
-        <div class="menu-item"><div class="menu-item-featured">&#9670;</div>
-          <div class="menu-item-top"><span class="menu-item-name">Cold Brew Reserve</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 38</span></div>
-          <p class="menu-item-desc">18-hour cold steeped, served over a single large ice sphere. Dark and velvety.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Nitro Float</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 42</span></div>
-          <p class="menu-item-desc">Nitrogen-infused cold brew topped with salted caramel cream.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Iced Matcha Latte</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 35</span></div>
-          <p class="menu-item-desc">Ceremonial-grade Japanese matcha with oat milk and honey.</p>
-        </div>
+        <div class="menu-item"><div class="menu-item-featured">&#9670;</div><div class="menu-item-top"><span class="menu-item-name">Cold Brew Reserve</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 38</span></div><p class="menu-item-desc">18-hour cold steeped, served over a single large ice sphere.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Nitro Float</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 42</span></div><p class="menu-item-desc">Nitrogen-infused cold brew topped with salted caramel cream.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Iced Matcha Latte</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 35</span></div><p class="menu-item-desc">Ceremonial-grade Japanese matcha with oat milk and honey.</p></div>
       </div>
     </div>
 
-    <!-- Specialty -->
     <div class="menu-section fade-up">
-      <div class="menu-section-head">
-        <h2>Specialty</h2>
-        <div class="menu-divider"></div>
-      </div>
+      <div class="menu-section-head"><h2>Specialty</h2><div class="menu-divider"></div></div>
       <div class="menu-items">
-        <div class="menu-item"><div class="menu-item-featured">&#9670;</div>
-          <div class="menu-item-top"><span class="menu-item-name">RC Racer</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 48</span></div>
-          <p class="menu-item-desc">Espresso, dark chocolate, smoked salt, and orange peel. Named after our fastest lap.</p>
-        </div>
-        <div class="menu-item"><div class="menu-item-featured">&#9670;</div>
-          <div class="menu-item-top"><span class="menu-item-name">The Podium</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 52</span></div>
-          <p class="menu-item-desc">Triple shot, salted caramel, and a gold-dusted foam. A champion's reward.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Track Day Tonic</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 46</span></div>
-          <p class="menu-item-desc">Chilled espresso over elderflower tonic and yuzu. Unexpectedly brilliant.</p>
-        </div>
+        <div class="menu-item"><div class="menu-item-featured">&#9670;</div><div class="menu-item-top"><span class="menu-item-name">RC Racer</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 48</span></div><p class="menu-item-desc">Espresso, dark chocolate, smoked salt, and orange peel.</p></div>
+        <div class="menu-item"><div class="menu-item-featured">&#9670;</div><div class="menu-item-top"><span class="menu-item-name">The Podium</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 52</span></div><p class="menu-item-desc">Triple shot, salted caramel, and a gold-dusted foam. A champion's reward.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Track Day Tonic</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 46</span></div><p class="menu-item-desc">Chilled espresso over elderflower tonic and yuzu. Unexpectedly brilliant.</p></div>
       </div>
     </div>
 
-    <!-- Food -->
     <div class="menu-section fade-up">
-      <div class="menu-section-head">
-        <h2>Food</h2>
-        <div class="menu-divider"></div>
-      </div>
+      <div class="menu-section-head"><h2>Food</h2><div class="menu-divider"></div></div>
       <div class="menu-items">
-        <div class="menu-item"><div class="menu-item-featured">&#9670;</div>
-          <div class="menu-item-top"><span class="menu-item-name">Truffle Mushroom Toast</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 68</span></div>
-          <p class="menu-item-desc">Toasted sourdough, whipped ricotta, black truffle, and micro herbs.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Smoked Salmon Bagel</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 75</span></div>
-          <p class="menu-item-desc">House-cured salmon, dill cream cheese, capers, and red onion on a sesame bagel.</p>
-        </div>
-        <div class="menu-item"><div class="menu-item-featured">&#9670;</div>
-          <div class="menu-item-top"><span class="menu-item-name">Wagyu Beef Slider</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 95</span></div>
-          <p class="menu-item-desc">A trio of Wagyu mini burgers with caramelised onion and aged cheddar.</p>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-top"><span class="menu-item-name">Dark Chocolate Fondant</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 65</span></div>
-          <p class="menu-item-desc">Warm valrhona chocolate fondant with Madagascar vanilla ice cream.</p>
-        </div>
+        <div class="menu-item"><div class="menu-item-featured">&#9670;</div><div class="menu-item-top"><span class="menu-item-name">Truffle Mushroom Toast</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 68</span></div><p class="menu-item-desc">Toasted sourdough, whipped ricotta, black truffle, and micro herbs.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Smoked Salmon Bagel</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 75</span></div><p class="menu-item-desc">House-cured salmon, dill cream cheese, capers, and red onion.</p></div>
+        <div class="menu-item"><div class="menu-item-featured">&#9670;</div><div class="menu-item-top"><span class="menu-item-name">Wagyu Beef Slider</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 95</span></div><p class="menu-item-desc">A trio of Wagyu mini burgers with caramelised onion and aged cheddar.</p></div>
+        <div class="menu-item"><div class="menu-item-top"><span class="menu-item-name">Dark Chocolate Fondant</span><div class="menu-item-dots"></div><span class="menu-item-price">AED 65</span></div><p class="menu-item-desc">Warm valrhona chocolate fondant with Madagascar vanilla ice cream.</p></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ GALLERY ═══════════ -->
+<!-- ═══ GALLERY ═══ -->
 <section id="gallery">
   <div class="container">
     <div class="gallery-page-head fade-up">
@@ -847,59 +590,23 @@
       <p>Glimpses of the track, the machines, and the craft.</p>
     </div>
     <div class="gallery-columns">
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">The Main Circuit</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Café</span><span class="gallery-overlay-title">Artisan Coffee Bar</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Events</span><span class="gallery-overlay-title">Championship Podium</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Cars</span><span class="gallery-overlay-title">RC Fleet — Pro Series</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Venue</span><span class="gallery-overlay-title">Lounge &amp; Viewing Area</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">Track Day Action</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">Training Circuit</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Events</span><span class="gallery-overlay-title">Private Event Setup</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Café</span><span class="gallery-overlay-title">Espresso Station</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Venue</span><span class="gallery-overlay-title">Member Lounge</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">Night Race Series</span></div>
-      </div>
-      <div class="gallery-item fade-up">
-        <div class="gallery-thumb"><span class="gallery-placeholder">RC Track Café</span></div>
-        <div class="gallery-overlay"><span class="gallery-overlay-cat">Cars</span><span class="gallery-overlay-title">Custom Workshop</span></div>
-      </div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">The Main Circuit</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Café</span><span class="gallery-overlay-title">Artisan Coffee Bar</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Events</span><span class="gallery-overlay-title">Championship Podium</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Cars</span><span class="gallery-overlay-title">RC Fleet — Pro Series</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Venue</span><span class="gallery-overlay-title">Lounge &amp; Viewing Area</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">Track Day Action</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">Training Circuit</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Events</span><span class="gallery-overlay-title">Private Event Setup</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Café</span><span class="gallery-overlay-title">Espresso Station</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Venue</span><span class="gallery-overlay-title">Member Lounge</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Track</span><span class="gallery-overlay-title">Night Race Series</span></div></div>
+      <div class="gallery-item fade-up"><div class="gallery-thumb"><span class="gallery-placeholder">RC Hub &amp; Cafe</span></div><div class="gallery-overlay"><span class="gallery-overlay-cat">Cars</span><span class="gallery-overlay-title">Custom Workshop</span></div></div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ CTA BANNER ═══════════ -->
+<!-- ═══ CTA BANNER ═══ -->
 <div class="cta-banner">
   <div class="container">
     <div class="cta-banner-inner fade-up">
@@ -910,7 +617,7 @@
   </div>
 </div>
 
-<!-- ═══════════ BOOKING ═══════════ -->
+<!-- ═══ BOOKING ═══ -->
 <section id="booking">
   <div class="container">
     <div class="booking-head fade-up">
@@ -918,61 +625,38 @@
       <h2>Book Track Time</h2>
       <p>Secure your spot on the grid. Walk-ins are welcome, but reservations guarantee track availability and priority pit access.</p>
     </div>
-
-    <!-- Success state -->
     <div class="booking-success" id="bookingSuccess">
       <div class="check-ring">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <h2>Reservation Confirmed</h2>
-      <p>Thank you for booking with RC Track Café. We have received your request and will send a confirmation email shortly with further details.</p>
-      <button onclick="resetBooking()" class="btn btn-outline btn-full">Make Another Booking</button>
+      <p>Thank you for booking with LA RC Hub &amp; Cafe. We have received your request and will reach out shortly to confirm your slot.</p>
+      <button onclick="resetBooking()" class="btn btn-outline btn-full" style="max-width:320px;margin:0 auto;">Make Another Booking</button>
     </div>
-
     <div class="booking-form-wrap" id="bookingFormWrap">
       <form id="bookingForm" onsubmit="handleBook(event)">
         <div class="form-row">
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" id="bFirstName" placeholder="JOHN" required />
-            <span class="form-error" id="bFirstNameErr">First name is required</span>
-          </div>
-          <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" id="bLastName" placeholder="DOE" required />
-          </div>
+          <div class="form-group"><label>First Name</label><input type="text" placeholder="JOHN" required /></div>
+          <div class="form-group"><label>Last Name</label><input type="text" placeholder="DOE" required /></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="bEmail" placeholder="JOHN@EXAMPLE.COM" required />
-          </div>
-          <div class="form-group">
-            <label>Phone (Optional)</label>
-            <input type="tel" placeholder="+971 50 123 4567" />
-          </div>
+          <div class="form-group"><label>Email</label><input type="email" placeholder="JOHN@EXAMPLE.COM" required /></div>
+          <div class="form-group"><label>Phone / Contact</label><input type="tel" placeholder="+91 88250 42800" /></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Date</label>
-            <input type="date" id="bDate" required />
-          </div>
+          <div class="form-group"><label>Date</label><input type="date" required /></div>
           <div class="form-group">
             <label>Time</label>
-            <select id="bTime" required style="height:48px;">
+            <select required style="height:48px;">
               <option value="" disabled selected>SELECT TIME</option>
-              <option value="10:00">10:00 AM</option>
-              <option value="12:00">12:00 PM</option>
-              <option value="14:00">02:00 PM</option>
-              <option value="16:00">04:00 PM</option>
-              <option value="18:00">06:00 PM</option>
-              <option value="20:00">08:00 PM</option>
+              <option>10:00 AM</option><option>12:00 PM</option><option>02:00 PM</option>
+              <option>04:00 PM</option><option>06:00 PM</option><option>08:00 PM</option>
             </select>
           </div>
         </div>
         <div class="form-group">
           <label>Experience</label>
-          <select id="bExp" required style="height:48px;">
+          <select required style="height:48px;">
             <option value="" disabled selected>SELECT EXPERIENCE</option>
             <option>Open Practice (Bring Your Own)</option>
             <option>Basic Rental Package</option>
@@ -983,20 +667,18 @@
         </div>
         <div class="form-group">
           <label>Special Requests</label>
-          <textarea placeholder="ANY SPECIFIC CHASSIS REQUIREMENTS OR COFFEE PREFERENCES?"></textarea>
+          <textarea placeholder="ANY SPECIFIC REQUIREMENTS OR COFFEE PREFERENCES?"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary btn-full btn-lg" id="bookBtn">
-          Confirm Reservation
-        </button>
+        <button type="submit" id="bookBtn" class="btn btn-primary btn-full btn-lg" style="margin-top:8px;">Confirm Reservation</button>
       </form>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ CONTACT ═══════════ -->
+<!-- ═══ CONTACT & LOCATION ═══ -->
 <section id="contact">
   <div class="container">
-    <div class="contact-page-head fade-up">
+    <div class="contact-head fade-up">
       <span class="label">Connect</span>
       <h2>Contact Us</h2>
     </div>
@@ -1005,58 +687,74 @@
       <div class="contact-info-blocks fade-up">
         <div class="contact-block">
           <h4>Location</h4>
-          <address>Dubai Autodrome Circuit<br>Motor City, Dubai<br>United Arab Emirates</address>
+          <address>
+            <a href="https://maps.app.goo.gl/Ax5oZPLmYdmaUmk56?g_st=ic" target="_blank" rel="noopener">
+              LA RC Hub &amp; Cafe<br />View on Google Maps &rarr;
+            </a>
+          </address>
         </div>
         <div class="contact-block">
           <h4>Hours</h4>
           <ul class="hours-list">
-            <li><span>Mon – Thu</span><span class="hours-time">10:00 – 22:00</span></li>
-            <li><span>Fri – Sat</span><span class="hours-time">09:00 – 00:00</span></li>
-            <li><span>Sunday</span><span class="hours-time">09:00 – 22:00</span></li>
+            <li><span>Mon &ndash; Thu</span><span class="hours-time">10:00 &ndash; 22:00</span></li>
+            <li><span>Fri &ndash; Sat</span><span class="hours-time">09:00 &ndash; 00:00</span></li>
+            <li><span>Sunday</span><span class="hours-time">09:00 &ndash; 22:00</span></li>
           </ul>
         </div>
         <div class="contact-block">
           <h4>Direct</h4>
-          <p class="contact-direct" style="margin-bottom:10px;">
-            <span>T.</span><a href="tel:+97141234567">+971 4 123 4567</a>
-          </p>
-          <p class="contact-direct">
-            <span>E.</span><a href="mailto:concierge@rctrackcafe.com">concierge@rctrackcafe.com</a>
-          </p>
+          <p class="contact-direct"><span>T.</span><a href="tel:+918825042800">+91 88250 42800</a></p>
+          <p class="contact-direct" style="margin-bottom:0"><span>IG.</span><a href="https://www.instagram.com/la_rc_cafe?igsh=dmYyZGlveTR0MDRi" target="_blank" rel="noopener">@la_rc_cafe</a></p>
+        </div>
+        <!-- Social Badges -->
+        <div class="social-badges">
+          <a href="https://www.instagram.com/la_rc_cafe?igsh=dmYyZGlveTR0MDRi" target="_blank" rel="noopener" class="social-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+            Instagram
+          </a>
+          <a href="https://maps.app.goo.gl/Ax5oZPLmYdmaUmk56?g_st=ic" target="_blank" rel="noopener" class="social-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            Get Directions
+          </a>
+          <a href="tel:+918825042800" class="social-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l.99-.89a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            Call Us
+          </a>
+        </div>
+        <!-- Map embed -->
+        <div class="map-embed">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.7!2d91.75!3d26.18!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zTEEgUkMgSHViICYgQ2FmZQ!5e0!3m2!1sen!2sin!4v1"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            title="LA RC Hub & Cafe Location">
+          </iframe>
         </div>
       </div>
 
-      <!-- Form -->
+      <!-- Contact Form -->
       <div class="fade-up">
         <div class="contact-success" id="contactSuccess">
-          <div class="check-ring">
+          <div class="check-ring-sm">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <h3>Message Received</h3>
-          <p>We will be in touch shortly.</p>
+          <p>We will be in touch shortly at your provided contact details.</p>
           <button onclick="resetContact()" class="btn btn-outline">Send Another</button>
         </div>
         <div class="contact-form-box" id="contactFormBox">
           <form onsubmit="handleContact(event)">
-            <div class="form-group">
-              <label>Full Name</label>
-              <input type="text" placeholder="YOUR NAME" required />
-            </div>
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" placeholder="YOUR EMAIL" required />
-            </div>
-            <div class="form-group">
-              <label>Subject (Optional)</label>
-              <input type="text" placeholder="INQUIRY SUBJECT" />
-            </div>
-            <div class="form-group">
-              <label>Message</label>
-              <textarea placeholder="HOW CAN WE ASSIST YOU?" style="min-height:150px;" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-full btn-lg" id="contactBtn">
-              Send Message
-            </button>
+            <div class="form-group" style="margin-bottom:24px;"><label>Full Name</label><input type="text" placeholder="YOUR NAME" required /></div>
+            <div class="form-group" style="margin-bottom:24px;"><label>Email</label><input type="email" placeholder="YOUR EMAIL" required /></div>
+            <div class="form-group" style="margin-bottom:24px;"><label>Phone (Optional)</label><input type="tel" placeholder="+91 88250 42800" /></div>
+            <div class="form-group" style="margin-bottom:24px;"><label>Subject</label><input type="text" placeholder="INQUIRY SUBJECT" /></div>
+            <div class="form-group" style="margin-bottom:28px;"><label>Message</label><textarea placeholder="HOW CAN WE ASSIST YOU?" style="min-height:130px;" required></textarea></div>
+            <button type="submit" id="contactBtn" class="btn btn-primary btn-full btn-lg">Send Message</button>
           </form>
         </div>
       </div>
@@ -1064,16 +762,16 @@
   </div>
 </section>
 
-<!-- ═══════════ FOOTER ═══════════ -->
+<!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="#home" class="foot-logo">
-          <span class="foot-logo-ring">R</span>
-          RC TRACK CAFÉ
-        </a>
-        <p>Dubai's premier luxury RC racing venue and artisan café. Where the precision of motorsport meets the craft of specialty coffee.</p>
+        <div class="foot-logo">
+          <div class="foot-logo-img"><img src="logo.jpeg" alt="LA RC Hub & Cafe" /></div>
+          <span class="foot-logo-text">LA RC HUB &amp; CAFE</span>
+        </div>
+        <p>The region's premier luxury RC racing venue and artisan café. Where the precision of motorsport meets the craft of specialty coffee.</p>
       </div>
       <div class="footer-col">
         <h4>Explore</h4>
@@ -1087,84 +785,80 @@
       <div class="footer-col">
         <h4>Contact</h4>
         <ul>
-          <li><a href="#">Dubai Autodrome Circuit</a></li>
-          <li><a href="#">Motor City, Dubai, UAE</a></li>
-          <li><a href="tel:+97141234567">+971 4 123 4567</a></li>
-          <li><a href="mailto:concierge@rctrackcafe.com">concierge@rctrackcafe.com</a></li>
+          <li><a href="tel:+918825042800">+91 88250 42800</a></li>
+          <li><a href="https://www.instagram.com/la_rc_cafe?igsh=dmYyZGlveTR0MDRi" target="_blank" rel="noopener">@la_rc_cafe</a></li>
+          <li><a href="https://maps.app.goo.gl/Ax5oZPLmYdmaUmk56?g_st=ic" target="_blank" rel="noopener">Get Directions</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 RC Track Café. All rights reserved.</p>
-      <p>Dubai Autodrome Circuit &middot; Motor City, Dubai</p>
+      <p>&copy; 2026 LA RC Hub &amp; Cafe. All rights reserved.</p>
+      <p>Est. 2026</p>
     </div>
   </div>
 </footer>
 
 <script>
-  /* ── Navbar scroll ── */
+  /* Navbar scroll */
   const nav = document.getElementById('navbar');
-  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 30);
-  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 30), { passive: true });
 
-  /* ── Hamburger ── */
+  /* Hamburger */
   const ham = document.getElementById('ham');
   const drw = document.getElementById('drawer');
   ham.addEventListener('click', () => {
-    ham.classList.toggle('open');
-    drw.classList.toggle('open');
+    ham.classList.toggle('open'); drw.classList.toggle('open');
     document.body.style.overflow = drw.classList.contains('open') ? 'hidden' : '';
   });
-  function closeDrw() {
-    ham.classList.remove('open'); drw.classList.remove('open');
-    document.body.style.overflow = '';
-  }
+  function closeDrw() { ham.classList.remove('open'); drw.classList.remove('open'); document.body.style.overflow = ''; }
 
-  /* ── Active nav link on scroll ── */
-  const sections = document.querySelectorAll('section[id]');
+  /* Active nav on scroll */
+  const secs = document.querySelectorAll('section[id]');
   const navAs = document.querySelectorAll('.nav-links a');
-  const io = new IntersectionObserver(entries => {
+  new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
+      if (e.isIntersecting)
         navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
-      }
     });
-  }, { threshold: 0.35 });
-  sections.forEach(s => io.observe(s));
+  }, { threshold: 0.35 }).observe && secs.forEach(s => {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting)
+          navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+      });
+    }, { threshold: 0.35 }).observe(s);
+  });
 
-  /* ── Fade-up on scroll ── */
-  const fu = document.querySelectorAll('.fade-up');
+  /* Fade-up observer */
   const fuObs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); fuObs.unobserve(e.target); } });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-  fu.forEach(el => fuObs.observe(el));
+  }, { threshold: 0.08, rootMargin: '0px 0px -36px 0px' });
+  document.querySelectorAll('.fade-up').forEach(el => fuObs.observe(el));
 
-  /* ── Counter animation ── */
+  /* Counter animation */
   function animCount(el, end, suffix = '') {
-    let start = 0, dur = 1800, ts = null;
-    const tick = (t) => {
+    let ts = null, dur = 1800;
+    const step = t => {
       if (!ts) ts = t;
       const p = Math.min((t - ts) / dur, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      el.textContent = (end >= 1000 ? (Math.floor(ease * end / 1000) + 'K') : Math.floor(ease * end)) + suffix;
-      if (p < 1) requestAnimationFrame(tick);
+      const v = Math.floor((1 - Math.pow(1 - p, 3)) * end);
+      el.textContent = (end >= 1000 ? Math.floor(v / 1000) + 'K' : v) + suffix;
+      if (p < 1) requestAnimationFrame(step);
       else el.textContent = (end >= 1000 ? Math.floor(end / 1000) + 'K' : end) + suffix;
     };
-    requestAnimationFrame(tick);
+    requestAnimationFrame(step);
   }
-  const statEls = document.querySelectorAll('.stat-num[data-target]');
   const cntObs = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
-        const el = e.target;
-        animCount(el, +el.dataset.target, el.dataset.suffix || '');
-        cntObs.unobserve(el);
+        animCount(e.target, +e.target.dataset.target, e.target.dataset.suffix || '');
+        cntObs.unobserve(e.target);
       }
     });
   }, { threshold: 0.6 });
-  statEls.forEach(el => cntObs.observe(el));
+  document.querySelectorAll('.stat-num[data-target]').forEach(el => cntObs.observe(el));
 
-  /* ── Booking form ── */
+  /* Booking form */
   function handleBook(e) {
     e.preventDefault();
     const btn = document.getElementById('bookBtn');
@@ -1172,7 +866,7 @@
     setTimeout(() => {
       document.getElementById('bookingFormWrap').classList.add('hidden');
       document.getElementById('bookingSuccess').classList.add('show');
-      window.scrollTo({ top: document.getElementById('booking').offsetTop - 80, behavior: 'smooth' });
+      document.getElementById('booking').scrollIntoView({ behavior: 'smooth', block: 'start' });
       btn.textContent = 'Confirm Reservation'; btn.disabled = false;
     }, 1200);
   }
@@ -1182,7 +876,7 @@
     document.getElementById('bookingForm').reset();
   }
 
-  /* ── Contact form ── */
+  /* Contact form */
   function handleContact(e) {
     e.preventDefault();
     const btn = document.getElementById('contactBtn');
@@ -1196,10 +890,9 @@
   function resetContact() {
     document.getElementById('contactSuccess').classList.remove('show');
     document.getElementById('contactFormBox').classList.remove('hidden');
-    e?.target?.closest('form')?.reset();
   }
 
-  /* ── Smooth anchor scroll ── */
+  /* Smooth scroll */
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', ev => {
       const t = document.querySelector(a.getAttribute('href'));
