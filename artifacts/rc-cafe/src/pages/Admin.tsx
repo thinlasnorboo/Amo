@@ -7,9 +7,33 @@ import {
   useDeleteBooking,
   useCreateBooking,
   useListContactMessages,
+  useListMenuItems,
+  useCreateMenuItem,
+  useUpdateMenuItem,
+  useDeleteMenuItem,
 } from "@workspace/api-client-react";
 
-type Tab = "overview" | "bookings" | "messages";
+type Tab = "overview" | "bookings" | "messages" | "menu";
+
+interface MenuForm {
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+  featured: boolean;
+}
+
+const EMPTY_MENU_FORM: MenuForm = {
+  name: "", description: "", price: "", category: "espresso", featured: false,
+};
+
+const MENU_CATEGORIES = [
+  { value: "espresso",  label: "Espresso" },
+  { value: "filter",    label: "Filter Coffee" },
+  { value: "cold",      label: "Cold Drinks" },
+  { value: "specialty", label: "Specialty" },
+  { value: "food",      label: "Food" },
+];
 type BookingStatus = "pending" | "confirmed" | "cancelled";
 
 interface BookingForm {
@@ -162,6 +186,60 @@ function BookingFormFields({ form, onChange }: {
   );
 }
 
+function MenuItemFormFields({ form, onChange }: {
+  form: MenuForm;
+  onChange: (k: keyof MenuForm, v: string | boolean) => void;
+}) {
+  const inputStyle = {
+    width: "100%", background: BG, border: `1px solid ${BORDER}`,
+    color: FG, fontFamily: "'Inter',sans-serif", fontSize: 13,
+    padding: "11px 14px", outline: "none", boxSizing: "border-box" as const,
+  };
+  const labelStyle = {
+    display: "block" as const, fontSize: 10, fontWeight: 600 as const,
+    letterSpacing: "0.18em", textTransform: "uppercase" as const,
+    color: MUTED, marginBottom: 7,
+  };
+  return (
+    <>
+      <div style={{ marginBottom: 20 }}>
+        <label style={labelStyle}>Item Name *</label>
+        <input style={inputStyle} value={form.name} required
+          onChange={e => onChange("name", e.target.value)} />
+      </div>
+      <div style={{ marginBottom: 20 }}>
+        <label style={labelStyle}>Description</label>
+        <textarea style={{ ...inputStyle, minHeight: 72, resize: "none" }} value={form.description}
+          onChange={e => onChange("description", e.target.value)} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+        <div>
+          <label style={labelStyle}>Price (₹) *</label>
+          <input type="number" min="0" style={inputStyle} value={form.price} required
+            onChange={e => onChange("price", e.target.value)} />
+        </div>
+        <div>
+          <label style={labelStyle}>Category *</label>
+          <select style={{ ...inputStyle, height: 44 }} value={form.category} required
+            onChange={e => onChange("category", e.target.value)}>
+            {MENU_CATEGORIES.map(c => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <input type="checkbox" id="featured-chk" checked={form.featured}
+          onChange={e => onChange("featured", e.target.checked)}
+          style={{ width: 16, height: 16, accentColor: RED, cursor: "pointer" }} />
+        <label htmlFor="featured-chk" style={{ ...labelStyle, marginBottom: 0, cursor: "pointer" }}>
+          Mark as Featured (★ shown on menu)
+        </label>
+      </div>
+    </>
+  );
+}
+
 export default function Admin() {
   const [, navigate] = useLocation();
   const [tab, setTab] = useState<Tab>("overview");
@@ -176,6 +254,17 @@ export default function Admin() {
   const { data: stats } = useGetStats();
   const { data: bookings, isLoading: bookingsLoading } = useListBookings();
   const { data: messages, isLoading: msgsLoading } = useListContactMessages();
+
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const [editMenuItem, setEditMenuItem] = useState<null | { id: number; form: MenuForm }>(null);
+  const [deleteMenuConfirm, setDeleteMenuConfirm] = useState<null | number>(null);
+  const [addMenuForm, setAddMenuForm] = useState<MenuForm>(EMPTY_MENU_FORM);
+  const [menuCatFilter, setMenuCatFilter] = useState("all");
+
+  const { data: menuItems, isLoading: menuLoading } = useListMenuItems();
+  const createMenuItem = useCreateMenuItem();
+  const updateMenuItem = useUpdateMenuItem();
+  const deleteMenuItem = useDeleteMenuItem();
 
   const createBooking = useCreateBooking();
   const updateBooking = useUpdateBooking();
@@ -279,7 +368,7 @@ export default function Admin() {
         {/* Tabs */}
         <div style={{ background: CARD, borderBottom: `1px solid ${BORDER}`, overflowX: "auto" }}>
           <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex" }}>
-            {(["overview", "bookings", "messages"] as Tab[]).map(t => (
+            {(["overview", "bookings", "messages", "menu"] as Tab[]).map(t => (
               <button key={t} onClick={() => setTab(t)} style={{
                 padding: "15px 28px", fontSize: 11, letterSpacing: "0.18em",
                 textTransform: "uppercase", background: "none", border: "none",
@@ -288,9 +377,10 @@ export default function Admin() {
                 borderBottom: `2px solid ${tab === t ? RED : "transparent"}`,
                 transition: ".2s",
               }}>
-                {t === "bookings" ? `Bookings${bookings ? ` (${bookings.length})` : ""}` :
-                  t === "messages" ? `Messages${messages ? ` (${messages.length})` : ""}` :
-                    "Overview"}
+                {t === "bookings"  ? `Bookings${bookings ? ` (${bookings.length})` : ""}` :
+                 t === "messages"  ? `Messages${messages ? ` (${messages.length})` : ""}` :
+                 t === "menu"      ? `Menu${menuItems ? ` (${menuItems.length})` : ""}` :
+                 "Overview"}
               </button>
             ))}
           </div>
@@ -482,7 +572,173 @@ export default function Admin() {
               )}
             </div>
           )}
+
+          {/* ── MENU EDITOR ── */}
+          {tab === "menu" && (
+            <div>
+              <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
+                <button onClick={() => { setAddMenuForm(EMPTY_MENU_FORM); setShowAddMenu(true); }} style={{
+                  background: RED, color: "#fff", border: "none", padding: "11px 24px",
+                  fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>+ Add Item</button>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {["all", ...MENU_CATEGORIES.map(c => c.value)].map(f => (
+                    <button key={f} onClick={() => setMenuCatFilter(f)} style={{
+                      padding: "8px 14px", fontSize: 10, fontWeight: 600, letterSpacing: "0.15em",
+                      textTransform: "uppercase", background: menuCatFilter === f ? RED : CARD,
+                      border: `1px solid ${menuCatFilter === f ? RED : BORDER}`,
+                      color: menuCatFilter === f ? "#fff" : MUTED,
+                      cursor: "pointer", fontFamily: "'Inter',sans-serif", transition: ".2s",
+                    }}>
+                      {f === "all" ? "All" : MENU_CATEGORIES.find(c => c.value === f)?.label ?? f}
+                    </button>
+                  ))}
+                </div>
+                <span style={{ fontSize: 12, color: MUTED, marginLeft: "auto" }}>
+                  {(menuItems?.filter(m => menuCatFilter === "all" || m.category === menuCatFilter) ?? []).length} items
+                </span>
+              </div>
+
+              {menuLoading ? (
+                <div>{[...Array(6)].map((_, i) => <div key={i} className="sc" style={{ height: 52, marginBottom: 8 }} />)}</div>
+              ) : menuItems && menuItems.length > 0 ? (
+                <div className="mob-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>#</th><th>Name</th><th>Category</th><th>Description</th>
+                        <th>Price (₹)</th><th>Featured</th><th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {menuItems.filter(m => menuCatFilter === "all" || m.category === menuCatFilter).map(m => (
+                        <tr key={m.id}>
+                          <td style={{ color: MUTED, fontSize: 11 }}>#{m.id}</td>
+                          <td style={{ color: FG, fontWeight: 500 }}>{m.name}</td>
+                          <td>
+                            <span style={{
+                              display: "inline-block", padding: "3px 10px", fontSize: 10,
+                              fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                              background: "rgba(239,68,68,0.1)", color: RED,
+                              border: "1px solid rgba(239,68,68,0.25)",
+                            }}>{m.category}</span>
+                          </td>
+                          <td style={{ fontSize: 12, color: MUTED, maxWidth: 280 }}>
+                            <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 260 }}>
+                              {m.description}
+                            </span>
+                          </td>
+                          <td style={{ fontFamily: "monospace", fontWeight: 600, color: FG }}>₹{m.price}</td>
+                          <td>
+                            {m.featured
+                              ? <span style={{ color: "#22c55e", fontSize: 13 }}>★ Yes</span>
+                              : <span style={{ color: MUTED, fontSize: 12 }}>—</span>}
+                          </td>
+                          <td style={{ whiteSpace: "nowrap" }}>
+                            <button className="ab ab-ed" style={{ marginRight: 6 }} onClick={() => setEditMenuItem({
+                              id: m.id,
+                              form: { name: m.name, description: m.description, price: String(m.price), category: m.category, featured: m.featured ?? false },
+                            })}>Edit</button>
+                            <button className="ab ab-dl" onClick={() => setDeleteMenuConfirm(m.id)}>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ textAlign: "center", padding: 64, border: `1px solid ${BORDER}`, background: CARD }}>
+                  <p style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED }}>No menu items</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
+        {/* ── ADD MENU ITEM MODAL ── */}
+        {showAddMenu && (
+          <Modal title="Add Menu Item" onClose={() => setShowAddMenu(false)}>
+            <form onSubmit={(e: FormEvent) => {
+              e.preventDefault();
+              createMenuItem.mutate({ data: {
+                name: addMenuForm.name, description: addMenuForm.description,
+                price: Number(addMenuForm.price),
+                category: addMenuForm.category as "espresso"|"filter"|"cold"|"food"|"specialty",
+                featured: addMenuForm.featured,
+              }}, { onSuccess: () => { setShowAddMenu(false); setAddMenuForm(EMPTY_MENU_FORM); } });
+            }}>
+              <MenuItemFormFields form={addMenuForm} onChange={(k, v) => setAddMenuForm(f => ({ ...f, [k]: v }))} />
+              <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
+                <button type="submit" disabled={createMenuItem.isPending} style={{
+                  flex: 1, background: RED, color: "#fff", border: "none", height: 48,
+                  fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>{createMenuItem.isPending ? "Adding..." : "Add Item"}</button>
+                <button type="button" onClick={() => setShowAddMenu(false)} style={{
+                  background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+                  padding: "0 24px", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>Cancel</button>
+              </div>
+            </form>
+          </Modal>
+        )}
+
+        {/* ── EDIT MENU ITEM MODAL ── */}
+        {editMenuItem && (
+          <Modal title={`Edit: ${editMenuItem.form.name}`} onClose={() => setEditMenuItem(null)}>
+            <form onSubmit={(e: FormEvent) => {
+              e.preventDefault();
+              if (!editMenuItem) return;
+              updateMenuItem.mutate({ id: editMenuItem.id, data: {
+                name: editMenuItem.form.name, description: editMenuItem.form.description,
+                price: Number(editMenuItem.form.price),
+                category: editMenuItem.form.category as "espresso"|"filter"|"cold"|"food"|"specialty",
+                featured: editMenuItem.form.featured,
+              }}, { onSuccess: () => setEditMenuItem(null) });
+            }}>
+              <MenuItemFormFields
+                form={editMenuItem.form}
+                onChange={(k, v) => setEditMenuItem(em => em ? { ...em, form: { ...em.form, [k]: v } } : em)}
+              />
+              <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
+                <button type="submit" disabled={updateMenuItem.isPending} style={{
+                  flex: 1, background: RED, color: "#fff", border: "none", height: 48,
+                  fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>{updateMenuItem.isPending ? "Saving..." : "Save Changes"}</button>
+                <button type="button" onClick={() => setEditMenuItem(null)} style={{
+                  background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+                  padding: "0 24px", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase",
+                  cursor: "pointer", fontFamily: "'Inter',sans-serif",
+                }}>Cancel</button>
+              </div>
+            </form>
+          </Modal>
+        )}
+
+        {/* ── DELETE MENU ITEM CONFIRM ── */}
+        {deleteMenuConfirm !== null && (
+          <Modal title="Delete Menu Item" onClose={() => setDeleteMenuConfirm(null)}>
+            <p style={{ fontSize: 14, color: "hsl(0 0% 70%)", marginBottom: 28, lineHeight: 1.75 }}>
+              Are you sure you want to delete this menu item? This cannot be undone.
+            </p>
+            <div style={{ display: "flex", gap: 12 }}>
+              <button onClick={() => deleteMenuItem.mutate({ id: deleteMenuConfirm }, { onSuccess: () => setDeleteMenuConfirm(null) })}
+                disabled={deleteMenuItem.isPending} style={{
+                flex: 1, background: RED, color: "#fff", border: "none", height: 48,
+                fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                cursor: "pointer", fontFamily: "'Inter',sans-serif",
+              }}>{deleteMenuItem.isPending ? "Deleting..." : "Yes, Delete"}</button>
+              <button onClick={() => setDeleteMenuConfirm(null)} style={{
+                background: "none", border: `1px solid ${BORDER}`, color: MUTED,
+                padding: "0 24px", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase",
+                cursor: "pointer", fontFamily: "'Inter',sans-serif",
+              }}>Cancel</button>
+            </div>
+          </Modal>
+        )}
 
         {/* ── ADD BOOKING MODAL ── */}
         {showAdd && (

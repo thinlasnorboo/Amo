@@ -156,6 +156,65 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MenuItem"
+    post:
+      operationId: createMenuItem
+      tags: [menu]
+      summary: Create a menu item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MenuItem"
+        "400":
+          description: Bad request
+
+  /menu/{id}:
+    patch:
+      operationId: updateMenuItem
+      tags: [menu]
+      summary: Update a menu item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MenuItem"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteMenuItem
+      tags: [menu]
+      summary: Delete a menu item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
 
   /gallery:
     get:
@@ -292,6 +351,28 @@ components:
         price:       { type: number }
         category:    { type: string, enum: [espresso, filter, cold, food, specialty] }
         featured:    { type: boolean }
+        sortOrder:   { type: integer }
+
+    MenuItemInput:
+      type: object
+      required: [name, description, price, category]
+      properties:
+        name:        { type: string, minLength: 1 }
+        description: { type: string }
+        price:       { type: number }
+        category:    { type: string, enum: [espresso, filter, cold, food, specialty] }
+        featured:    { type: boolean }
+        sortOrder:   { type: integer }
+
+    MenuItemUpdate:
+      type: object
+      properties:
+        name:        { type: string }
+        description: { type: string }
+        price:       { type: number }
+        category:    { type: string, enum: [espresso, filter, cold, food, specialty] }
+        featured:    { type: boolean }
+        sortOrder:   { type: integer }
 
     GalleryItem:
       type: object

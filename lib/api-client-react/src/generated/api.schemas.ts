@@ -98,6 +98,48 @@ export interface MenuItem {
   price: number;
   category: MenuItemCategory;
   featured?: boolean;
+  sortOrder?: number;
+}
+
+export type MenuItemInputCategory = typeof MenuItemInputCategory[keyof typeof MenuItemInputCategory];
+
+
+export const MenuItemInputCategory = {
+  espresso: 'espresso',
+  filter: 'filter',
+  cold: 'cold',
+  food: 'food',
+  specialty: 'specialty',
+} as const;
+
+export interface MenuItemInput {
+  /** @minLength 1 */
+  name: string;
+  description: string;
+  price: number;
+  category: MenuItemInputCategory;
+  featured?: boolean;
+  sortOrder?: number;
+}
+
+export type MenuItemUpdateCategory = typeof MenuItemUpdateCategory[keyof typeof MenuItemUpdateCategory];
+
+
+export const MenuItemUpdateCategory = {
+  espresso: 'espresso',
+  filter: 'filter',
+  cold: 'cold',
+  food: 'food',
+  specialty: 'specialty',
+} as const;
+
+export interface MenuItemUpdate {
+  name?: string;
+  description?: string;
+  price?: number;
+  category?: MenuItemUpdateCategory;
+  featured?: boolean;
+  sortOrder?: number;
 }
 
 export interface GalleryItem {

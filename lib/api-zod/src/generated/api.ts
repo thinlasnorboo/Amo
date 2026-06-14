@@ -144,9 +144,61 @@ export const ListMenuItemsResponseItem = zod.object({
   "description": zod.string(),
   "price": zod.number(),
   "category": zod.enum(['espresso', 'filter', 'cold', 'food', 'specialty']),
-  "featured": zod.boolean().optional()
+  "featured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
 })
 export const ListMenuItemsResponse = zod.array(ListMenuItemsResponseItem)
+
+
+/**
+ * @summary Create a menu item
+ */
+
+
+
+export const CreateMenuItemBody = zod.object({
+  "name": zod.string().min(1),
+  "description": zod.string(),
+  "price": zod.number(),
+  "category": zod.enum(['espresso', 'filter', 'cold', 'food', 'specialty']),
+  "featured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+
+/**
+ * @summary Update a menu item
+ */
+export const UpdateMenuItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateMenuItemBody = zod.object({
+  "name": zod.string().optional(),
+  "description": zod.string().optional(),
+  "price": zod.number().optional(),
+  "category": zod.enum(['espresso', 'filter', 'cold', 'food', 'specialty']).optional(),
+  "featured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateMenuItemResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "description": zod.string(),
+  "price": zod.number(),
+  "category": zod.enum(['espresso', 'filter', 'cold', 'food', 'specialty']),
+  "featured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+
+/**
+ * @summary Delete a menu item
+ */
+export const DeleteMenuItemParams = zod.object({
+  "id": zod.coerce.number()
+})
 
 
 /**

@@ -5,14 +5,14 @@
  * RC Track Café API
  * OpenAPI spec version: 0.1.0
  */
-import type { MenuItemCategory } from './menuItemCategory';
+import type { MenuItemInputCategory } from './menuItemInputCategory';
 
-export interface MenuItem {
-  id: number;
+export interface MenuItemInput {
+  /** @minLength 1 */
   name: string;
   description: string;
   price: number;
-  category: MenuItemCategory;
+  category: MenuItemInputCategory;
   featured?: boolean;
   sortOrder?: number;
 }
